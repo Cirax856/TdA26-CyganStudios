@@ -45,6 +45,12 @@ public static class Program
             .AddDefaultTokenProviders()
             .AddDefaultUI();
 
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/login";
+            //options.AccessDeniedPath = "/access-denied";
+        });
+
         var app = builder.Build();
 
         app.UseSerilogRequestLogging();

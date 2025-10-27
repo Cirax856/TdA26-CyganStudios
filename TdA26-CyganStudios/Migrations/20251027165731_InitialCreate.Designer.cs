@@ -11,7 +11,7 @@ using TdA26_CyganStudios;
 namespace TdA26_CyganStudios.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251027161727_InitialCreate")]
+    [Migration("20251027165731_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

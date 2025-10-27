@@ -8,6 +8,7 @@ namespace TdA26_CyganStudios
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddControllers();
 
             var app = builder.Build();
 
@@ -28,6 +29,8 @@ namespace TdA26_CyganStudios
             app.MapStaticAssets();
             app.MapRazorPages()
                .WithStaticAssets();
+
+            app.MapControllers();
 
             app.Run();
         }

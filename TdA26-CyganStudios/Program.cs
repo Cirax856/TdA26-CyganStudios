@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
@@ -41,7 +40,7 @@ namespace TdA26_CyganStudios
             var app = builder.Build();
 
             app.UseSerilogRequestLogging();
-            
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

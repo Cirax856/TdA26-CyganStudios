@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -35,7 +36,9 @@ namespace TdA26_CyganStudios
             builder.Services.AddSerilog();
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>();
 
             var app = builder.Build();
 
@@ -50,6 +53,9 @@ namespace TdA26_CyganStudios
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseRouting();
 

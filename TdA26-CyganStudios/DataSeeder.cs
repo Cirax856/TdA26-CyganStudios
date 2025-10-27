@@ -5,6 +5,8 @@ namespace TdA26_CyganStudios;
 
 public static class DataSeeder
 {
+    public const string DefaultUserName = "lecturer";
+
     public static async Task SeedDefaultUserAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -12,24 +14,23 @@ public static class DataSeeder
 
         await context.Database.MigrateAsync();
 
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<int>>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
 
         const string LecturerRole = "lecturer";
         if (!await roleManager.RoleExistsAsync(LecturerRole))
         {
-            await roleManager.CreateAsync(new IdentityRole(LecturerRole));
+            await roleManager.CreateAsync(new IdentityRole<int>(LecturerRole));
         }
 
-        string DefaultUserName = "lecturer";
         string DefaultPassword = "TdA26!";
         string DefaultEmail = "lecturer@tda.com";
 
         var user = await userManager.FindByNameAsync(DefaultUserName);
         if (user == null)
         {
-            user = new IdentityUser
+            user = new IdentityUser<int>
             {
                 UserName = DefaultUserName,
                 Email = DefaultEmail,

@@ -3,16 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace TdA26_CyganStudios;
 
-public static class Program
+internal static class Program
 {
     public static async Task Main(string[] args)
     {
         var log = new LoggerConfiguration()
-            .WriteTo.Console()
-            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 8338607, outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 8338607, outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
@@ -35,9 +37,13 @@ public static class Program
         // Add services to the container.
         builder.Services.AddSerilog();
         builder.Services.AddRazorPages();
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        builder.Services.AddIdentity<IdentityUser<int>, IdentityRole<int>>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
         })
@@ -65,10 +71,10 @@ public static class Program
 
         app.UseHttpsRedirection();
 
+        app.UseRouting();
+
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.UseRouting();
 
         app.UseAuthorization();
 
@@ -94,6 +100,7 @@ public static class Program
             catch (Exception ex)
             {
                 Log.Fatal(ex, "An error occurred during database migration or seeding.");
+                throw;
             }
         }
 

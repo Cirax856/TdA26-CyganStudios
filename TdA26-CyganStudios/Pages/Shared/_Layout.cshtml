@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TdA26_CyganStudios</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/TdA26_CyganStudios.styles.css" asp-append-version="true" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - TdA26_CyganStudios</title>
+	<script type="importmap"></script>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/TdA26_CyganStudios.styles.css" asp-append-version="true" />
+
+	<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<meta name="apple-mobile-web-app-title" content="Tour de App" />
+	<link rel="manifest" href="/site.webmanifest" />
 </head>
 <body>
 	<div class="page-content">
@@ -62,16 +68,16 @@
 		</div>
 	</div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - CyganStudios - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+	<footer class="border-top footer text-muted">
+		<div class="container">
+			&copy; 2025 - CyganStudios - <a asp-area="" asp-page="/Privacy">Privacy</a>
+		</div>
+	</footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Db;
-using TdA26_CyganStudios.Pages.Dashboard;
 
 namespace TdA26_CyganStudios.Pages;
 
@@ -11,9 +10,9 @@ public class CoursesModel : PageModel
     private const int ItemsPerPage = 10;
 
     private readonly AppDbContext _appDb;
-    private readonly ILogger<CourseNewModel> _logger;
+    private readonly ILogger<CoursesModel> _logger;
 
-    public CoursesModel(AppDbContext appDb, ILogger<CourseNewModel> logger)
+    public CoursesModel(AppDbContext appDb, ILogger<CoursesModel> logger)
     {
         _appDb = appDb;
         _logger = logger;

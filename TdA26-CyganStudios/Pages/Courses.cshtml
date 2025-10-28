@@ -4,4 +4,79 @@
 	ViewData["Title"] = "Courses";
 }
 
-<p>courses</p>
+<h1>@ViewData["Title"]</h1>
+
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="SearchString" value="@Model.SearchString" class="form-control" placeholder="Search by name or description..." />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<br />
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+	@if (Model.Courses.Any())
+	{
+		@foreach (var course in Model.Courses)
+		{
+			<div class="col">
+				<a asp-page="/Courses/Details"
+				   asp-route-uuid="@course.Uuid"
+                   class="card h-100 shadow-sm text-decoration-none text-dark card-link-hover">
+                   
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-primary">@Html.DisplayFor(modelItem => course.Name)</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Lecturer: @Html.DisplayFor(modelItem => course.Lecturer.UserName)</h6>
+                        <p class="card-text flex-grow-1">@Html.DisplayFor(modelItem => course.Description)</p>
+                    </div>
+                    <div class="card-footer bg-light border-top">
+                        <small class="text-muted">Created At: @course.CreatedAtDT.ToString("g")</small>
+                    </div>
+                </a>
+            </div>
+		}
+	}
+	else
+	{
+		<div class="col-12">
+			<div class="alert alert-info text-center" role="alert">
+				No courses found.
+			</div>
+		</div>
+	}
+</div>
+
+<br />
+
+@if (Model.TotalPages > 0)
+{
+	var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+	<nav aria-label="Course pagination">
+		<ul class="pagination justify-content-center">
+			<li class="page-item @prevDisabled">
+				<a class="page-link"
+				   asp-page="/courses"
+				   asp-route-SearchString="@Model.SearchString"
+				   asp-route-PageIndex="@(Model.PageIndex - 1)">
+					Previous
+				</a>
+			</li>
+
+			<li class="page-item active" aria-current="page">
+				<span class="page-link">Page @Model.PageIndex of @Model.TotalPages</span>
+			</li>
+
+			<li class="page-item @nextDisabled">
+				<a class="page-link"
+				   asp-page="/courses"
+				   asp-route-SearchString="@Model.SearchString"
+				   asp-route-PageIndex="@(Model.PageIndex + 1)">
+					Next
+				</a>
+			</li>
+		</ul>
+	</nav>
+}

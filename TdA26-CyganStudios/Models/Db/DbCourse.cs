@@ -18,9 +18,29 @@ public class DbCourse
 
     public string? Description { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
+    public long CreatedAt { get; set; }
 
-    public DateTimeOffset UpdatedAt { get; set; }
+    public long UpdatedAt { get; set; }
+
+    [NotMapped]
+    public DateTimeOffset CreatedAtDT
+    {
+        get => DateTimeOffset.FromUnixTimeMilliseconds(UpdatedAt);
+        set
+        {
+            CreatedAt = value.ToUnixTimeMilliseconds();
+        }
+    }
+
+    [NotMapped]
+    public DateTimeOffset UpdatedAtDT
+    {
+        get => DateTimeOffset.FromUnixTimeMilliseconds(UpdatedAt);
+        set
+        {
+            UpdatedAt = value.ToUnixTimeMilliseconds();
+        }
+    }
 
     public DbCourse(IdentityUser<int> lecturer, string name, string? description, DateTimeOffset now)
     {
@@ -31,8 +51,8 @@ public class DbCourse
         LecturerId = lecturer.Id;
         Name = name;
         Description = description;
-        CreatedAt = now;
-        UpdatedAt = now;
+        CreatedAtDT = now.UtcDateTime;
+        UpdatedAtDT = now.UtcDateTime;
     }
 
     private DbCourse()

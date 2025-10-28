@@ -1,10 +1,17 @@
 html {
-  font-size: 14px;
+    font-size: 16px;
+}
+
+* {
+    font-family: "Dosis", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
 }
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 

@@ -32,7 +32,7 @@ public class DbCourse
         Name = name;
         Description = description;
         CreatedAt = now;
-        CreatedAt = now;
+        UpdatedAt = now;
     }
 
     private DbCourse()

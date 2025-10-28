@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using TdA26_CyganStudios.Models.Api;
 using TdA26_CyganStudios.Models.Db;
 
@@ -25,6 +26,8 @@ public sealed class CoursesController : ControllerBase
     [HttpPost]
     public async Task<CourseSummary> CreateCourse(CourseCreateRequest request)
     {
+        Debug.Assert(request is not null);
+
         var cancellationToken = HttpContext.RequestAborted;
 
         var lecturer = await _appDb.Users.FirstAsync(user => user.UserName == DataSeeder.DefaultUserName, cancellationToken);
@@ -56,6 +59,8 @@ public sealed class CoursesController : ControllerBase
     [HttpPut("{courseId}")]
     public async Task<IActionResult> UpdateCourse(Guid courseId, CourseUpdateRequest request)
     {
+        Debug.Assert(request is not null);
+
         var cancellationToken = HttpContext.RequestAborted;
 
         var course = await _appDb.Courses.FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);

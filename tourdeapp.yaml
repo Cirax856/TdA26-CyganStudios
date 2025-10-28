@@ -1,0 +1,16 @@
+# $schema: https://portalbush.tourde.cloud/static/schema.json
+exposedPort: 80
+containers:
+  - name: caddy
+    image: registry.tourde.cloud/cygan-studios-4072/caddy
+    port: 80
+  - name: web
+    image: registry.tourde.cloud/cygan-studios-4072/web
+    port: 8080
+build:
+  - name: caddy
+    context: ./caddy
+    dockerfile: ./caddy/Dockerfile
+  - name: web
+    context: ./TdA26-CyganStudios
+    dockerfile: ./TdA26-CyganStudios/Dockerfile

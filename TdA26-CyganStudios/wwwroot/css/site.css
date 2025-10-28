@@ -15,6 +15,47 @@ html {
   }
 }
 
+.logo-main {
+    height: 40px;
+    transition: filter 0.3s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #eaeaea;
+    }
+
+    .navbar {
+        background-color: #1e1e1e !important;
+    }
+
+    .logo-main {
+        content: url("/images/logo_1_dark.svg");
+    }
+
+    .border-bottom {
+        border-color: #333 !important;
+    }
+
+    a.nav-link {
+        color: #eaeaea !important;
+    }
+
+    a.nav-link:hover {
+        color: #ffffff !important;
+    }
+
+    footer {
+        background-color: #1e1e1e;
+        color: #aaa;
+    }
+
+    footer > * {
+        color: #aaa;
+    }
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }

@@ -1,6 +1,10 @@
 @page "/courses/{uuid}"
 @model TdA26_CyganStudios.Pages.Courses.DetailsModel
 @{
+	ViewData["Title"] = Model.Course.Name;
 }
 
-<p>course @(Model.CourseUuid)</p>
+<h1>@Model.Course.Name</h1>
+<h3>Lecturer: @Model.Course.Lecturer.UserName</h3>
+
+<p>@Model.Course.Description</p>

@@ -77,4 +77,44 @@ public class DashboardModel : PageModel
             .Take(ItemsPerPage)
             .ToListAsync();
     }
+
+    public async Task<IActionResult> OnPostDeleteAsync(Guid uuid)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser is null)
+        {
+            return Challenge();
+        }
+
+        var course = await _appDb.Courses.FirstOrDefaultAsync(c => c.Uuid == uuid);
+
+        if (course is null)
+        {
+            _logger.LogWarning("Delete attempt failed: Course {CourseUuid} not found.", uuid);
+            return NotFound();
+        }
+
+        if (course.LecturerId != currentUser.Id)
+        {
+            _logger.LogWarning("Delete attempt FORBIDDEN: User {UserId} does not own course {CourseUuid} (Owner: {OwnerId}).", currentUser.Id, uuid, course.LecturerId);
+            return Forbid();
+        }
+
+        try
+        {
+            _appDb.Courses.Remove(course);
+            await _appDb.SaveChangesAsync();
+
+            _logger.LogInformation("Course {CourseUuid} deleted successfully by user {UserId}.", uuid, currentUser.Id);
+
+            TempData["SuccessMessage"] = $"Course '{course.Name}' deleted successfully.";
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Error deleting course {CourseUuid} for user {UserId}.", uuid, currentUser.Id);
+            TempData["ErrorMessage"] = "An error occurred while deleting the course.";
+        }
+
+        return RedirectToPage();
+    }
 }

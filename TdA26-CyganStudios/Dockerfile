@@ -16,7 +16,7 @@ COPY ["TdA26-CyganStudios.csproj", "TdA26-CyganStudios/"]
 RUN dotnet restore "./TdA26-CyganStudios/TdA26-CyganStudios.csproj"
 COPY . .
 WORKDIR "/src/TdA26-CyganStudios"
-RUN dotnet build "./TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./TdA26-CyganStudios/TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish

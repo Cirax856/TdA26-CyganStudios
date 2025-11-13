@@ -16,4 +16,4 @@ jobs:
       - name: Upload to TdA
         uses: Student-Cyber-Games/upload-app@tda-26
         with:
-          tdc_token: ${{ secrets.TEAM_SECRET }}
+          tdc_token: ${{ secrets.TDC_TOKEN }}

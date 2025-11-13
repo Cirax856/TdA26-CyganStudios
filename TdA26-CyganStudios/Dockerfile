@@ -13,7 +13,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["TdA26-CyganStudios.csproj", "TdA26-CyganStudios/"]
-RUN dotnet restore "./TdA26-CyganStudios.csproj"
+RUN dotnet restore "./TdA26-CyganStudios/TdA26-CyganStudios.csproj"
 COPY . .
 WORKDIR "/src/TdA26-CyganStudios"
 RUN dotnet build "./TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/build

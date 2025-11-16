@@ -46,7 +46,9 @@ public sealed class CoursesController : ControllerBase
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        var course = await _appDb.Courses.FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
+        var course = await _appDb.Courses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
 
         if (course is null)
         {
@@ -101,6 +103,6 @@ public sealed class CoursesController : ControllerBase
 
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
 }

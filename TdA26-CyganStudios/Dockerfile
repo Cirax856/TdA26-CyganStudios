@@ -11,18 +11,16 @@ EXPOSE 8081
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /
-RUN ls -R /
-COPY ["TdA26-CyganStudios/TdA26-CyganStudios.csproj", "TdA26-CyganStudios/"]
-RUN dotnet restore "./TdA26-CyganStudios/TdA26-CyganStudios.csproj"
+WORKDIR /src
+COPY ["TdA26-CyganStudios.csproj", "./"]
+RUN dotnet restore "TdA26-CyganStudios.csproj"
 COPY . .
-WORKDIR "/TdA26-CyganStudios"
-RUN dotnet build "./TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "TdA26-CyganStudios.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

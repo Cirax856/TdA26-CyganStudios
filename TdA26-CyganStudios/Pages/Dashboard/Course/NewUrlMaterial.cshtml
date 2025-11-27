@@ -1,7 +1,7 @@
-@page "/dashboard/course/{uuid}/edit"
-@model TdA26_CyganStudios.Pages.Dashboard.CourseEditModel
+@page "/dashboard/course/{courseUuid}/material_new_url"
+@model TdA26_CyganStudios.Pages.Dashboard.MaterialNewModel
 @{
-	ViewData["Title"] = "Edit Course";
+	ViewData["Title"] = "New Url Material";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -18,12 +18,17 @@
 					<span asp-validation-for="Input.Name" class="text-danger"></span>
 				</div>
 				<div class="form-floating mb-3">
-					<input asp-for="Input.Description" class="form-control" placeholder="description" />
+					<input asp-for="Input.Description" class="form-control" aria-required="true" placeholder="description" />
 					<label asp-for="Input.Description" class="form-label">Description</label>
 					<span asp-validation-for="Input.Description" class="text-danger"></span>
 				</div>
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Url" class="form-control" aria-required="true" placeholder="material url" />
+					<label asp-for="Input.Url" class="form-label">Material url</label>
+					<span asp-validation-for="Input.Url" class="text-danger"></span>
+				</div>
 				<div>
-					<button id="create-submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+					<button id="create-submit" type="submit" class="w-100 btn btn-lg btn-primary">Create</button>
 				</div>
 			</form>
 		</section>

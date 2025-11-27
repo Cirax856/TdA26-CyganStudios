@@ -57,6 +57,12 @@ internal static class Program
             //options.AccessDeniedPath = "/access-denied";
         });
 
+        builder.Services.AddHttpClient("course_material_verify", client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+        });
+
         var app = builder.Build();
 
         app.UseSerilogRequestLogging();

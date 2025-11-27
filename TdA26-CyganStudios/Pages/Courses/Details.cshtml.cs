@@ -14,7 +14,7 @@ public class DetailsModel : PageModel
         _appDb = appDb;
     }
 
-    [BindProperty(Name = "uuid", SupportsGet = true)]
+    [BindProperty(Name = "courseUuid", SupportsGet = true)]
     public Guid CourseUuid { get; set; }
 
     public DbCourse Course { get; set; } = null!;

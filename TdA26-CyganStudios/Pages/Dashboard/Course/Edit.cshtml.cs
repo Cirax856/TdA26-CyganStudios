@@ -3,26 +3,27 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Db;
 
-namespace TdA26_CyganStudios.Pages.Dashboard;
+namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
 [Authorize(Roles = "lecturer")]
 
-public class CourseEditModel : PageModel
+public class EditModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public CourseEditModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<CourseNewModel> logger)
+    public EditModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
         _logger = logger;
     }
 
-    [BindProperty(Name = "uuid", SupportsGet = true)]
+    [BindProperty(Name = "courseUuid", SupportsGet = true)]
     public Guid CourseUuid { get; set; }
 
     [BindProperty]
@@ -38,11 +39,31 @@ public class CourseEditModel : PageModel
         public string? Description { get; set; }
     }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            return RedirectToPage("/Login");
+        }
+
         Input = new InputModel();
-        Input.Name = _appDb.Courses.FirstOrDefault(course => course.Uuid == CourseUuid).Name;
-        Input.Description = _appDb.Courses.FirstOrDefault(course => course.Uuid == CourseUuid).Description;
+        var course = await _appDb.Courses.FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        Input.Name = course.Name;
+        Input.Description = course.Description;
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -63,7 +84,7 @@ public class CourseEditModel : PageModel
             await _appDb.SaveChangesAsync();
 
             _logger.LogInformation("Course successfully edddited.");
-            return RedirectToPage("/Dashboard/Course", new { uuid = CourseUuid });
+            return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
         }
 
         // If we got this far, something failed, redisplay form

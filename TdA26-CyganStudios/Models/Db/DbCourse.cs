@@ -27,7 +27,7 @@ public class DbCourse
     [NotMapped]
     public DateTimeOffset CreatedAtDT
     {
-        get => DateTimeOffset.FromUnixTimeMilliseconds(UpdatedAt);
+        get => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt);
         set
         {
             CreatedAt = value.ToUnixTimeMilliseconds();
@@ -53,8 +53,8 @@ public class DbCourse
         LecturerId = lecturer.Id;
         Name = name;
         Description = description;
-        CreatedAtDT = now.UtcDateTime;
-        UpdatedAtDT = now.UtcDateTime;
+        CreatedAtDT = now;
+        UpdatedAtDT = now;
     }
 
     private DbCourse()

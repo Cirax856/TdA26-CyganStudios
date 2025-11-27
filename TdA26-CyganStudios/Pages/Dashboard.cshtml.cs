@@ -78,7 +78,7 @@ public class DashboardModel : PageModel
             .ToListAsync();
     }
 
-    public async Task<IActionResult> OnPostDeleteAsync(Guid uuid)
+    public async Task<IActionResult> OnPostDeleteAsync(Guid courseUuid)
     {
         var currentUser = await _userManager.GetUserAsync(User);
         if (currentUser is null)
@@ -86,17 +86,17 @@ public class DashboardModel : PageModel
             return Challenge();
         }
 
-        var course = await _appDb.Courses.FirstOrDefaultAsync(c => c.Uuid == uuid);
+        var course = await _appDb.Courses.FirstOrDefaultAsync(c => c.Uuid == courseUuid);
 
         if (course is null)
         {
-            _logger.LogWarning("Delete attempt failed: Course {CourseUuid} not found.", uuid);
+            _logger.LogWarning("Delete attempt failed: Course {CourseUuid} not found.", courseUuid);
             return NotFound();
         }
 
         if (course.LecturerId != currentUser.Id)
         {
-            _logger.LogWarning("Delete attempt FORBIDDEN: User {UserId} does not own course {CourseUuid} (Owner: {OwnerId}).", currentUser.Id, uuid, course.LecturerId);
+            _logger.LogWarning("Delete attempt FORBIDDEN: User {UserId} does not own course {CourseUuid} (Owner: {OwnerId}).", currentUser.Id, courseUuid, course.LecturerId);
             return Forbid();
         }
 
@@ -105,13 +105,13 @@ public class DashboardModel : PageModel
             _appDb.Courses.Remove(course);
             await _appDb.SaveChangesAsync();
 
-            _logger.LogInformation("Course {CourseUuid} deleted successfully by user {UserId}.", uuid, currentUser.Id);
+            _logger.LogInformation("Course {CourseUuid} deleted successfully by user {UserId}.", courseUuid, currentUser.Id);
 
             TempData["SuccessMessage"] = $"Course '{course.Name}' deleted successfully.";
         }
         catch (DbUpdateException ex)
         {
-            _logger.LogError(ex, "Error deleting course {CourseUuid} for user {UserId}.", uuid, currentUser.Id);
+            _logger.LogError(ex, "Error deleting course {CourseUuid} for user {UserId}.", courseUuid, currentUser.Id);
             TempData["ErrorMessage"] = "An error occurred while deleting the course.";
         }
 

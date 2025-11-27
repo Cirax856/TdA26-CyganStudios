@@ -63,7 +63,7 @@ public class CourseEditModel : PageModel
             await _appDb.SaveChangesAsync();
 
             _logger.LogInformation("Course successfully edddited.");
-            return LocalRedirect("~/dashboard");
+            return RedirectToPage("/Dashboard/Course", new { uuid = CourseUuid });
         }
 
         // If we got this far, something failed, redisplay form

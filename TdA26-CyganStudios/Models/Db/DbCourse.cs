@@ -11,7 +11,7 @@ public class DbCourse
 
     public int LecturerId { get; set; }
 
-    [ForeignKey("LecturerId")]
+    [ForeignKey(nameof(LecturerId))]
     public IdentityUser<int> Lecturer { get; set; }
 
     public string Name { get; set; }
@@ -21,6 +21,8 @@ public class DbCourse
     public long CreatedAt { get; set; }
 
     public long UpdatedAt { get; set; }
+
+    public ICollection<DbMaterial> Materials { get; set; } = [];
 
     [NotMapped]
     public DateTimeOffset CreatedAtDT

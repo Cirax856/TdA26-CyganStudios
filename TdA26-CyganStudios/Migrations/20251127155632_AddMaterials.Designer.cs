@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TdA26_CyganStudios;
 
@@ -10,9 +11,11 @@ using TdA26_CyganStudios;
 namespace TdA26_CyganStudios.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127155632_AddMaterials")]
+    partial class AddMaterials
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
@@ -240,6 +243,7 @@ namespace TdA26_CyganStudios.Migrations
             modelBuilder.Entity("TdA26_CyganStudios.Models.Db.DbMaterial", b =>
                 {
                     b.Property<Guid>("Uuid")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CourseId")

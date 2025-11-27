@@ -122,7 +122,4 @@ public class LoginModel : PageModel
         // If we got this far, something failed, redisplay form
         return Page();
     }
-
-    public async Task OnGetAsync(Uri? returnUrl = null)
-        => await OnGetAsync(returnUrl?.ToString());
 }

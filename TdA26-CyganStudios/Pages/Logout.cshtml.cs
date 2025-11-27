@@ -35,7 +35,4 @@ public class LogoutModel : PageModel
             return RedirectToPage();
         }
     }
-
-    public async Task<IActionResult> OnPost(Uri? returnUrl = null)
-        => await OnPost(returnUrl?.ToString());
 }

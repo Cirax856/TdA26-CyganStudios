@@ -107,10 +107,20 @@
                             }
                             else if (material is DbFileMaterial file)
                             {
-                                <div class="d-flex align-items-center gap-2 mt-1">
-                                    <span class="badge bg-body-secondary text-muted border">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+
+                                    <span class="px-2 py-1 small text-muted border rounded-pill">
                                         @FileSize.ToString(file.SizeInBytes)
                                     </span>
+
+                                    @if (file.IsPreviewable)
+                                    {
+                                        <a href="/api/courses/@(material.CourseId)/materials/@(material.Uuid)/preview" target="_blank"
+                                            class="card-link d-flex align-items-center gap-1">
+                                            <i class="bi bi-eye"></i>
+                                            Preview
+                                        </a>
+                                    }
 
                                     <a href="/api/courses/@(material.CourseId)/materials/@(material.Uuid)/download"
                                         class="card-link d-flex align-items-center gap-1">

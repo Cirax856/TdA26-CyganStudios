@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -34,11 +35,25 @@ public abstract class DbMaterial
 
 public sealed class DbFileMaterial : DbMaterial
 {
+    private static readonly FrozenSet<string> PreviewableMimeTypes =
+    [
+        "application/pdf",
+        "text/plain",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "video/mp4",
+        "audio/mpeg",
+    ];
+
     public required Guid FileUuid { get; set; }
 
     public required string MimeType { get; set; }
 
     public required long SizeInBytes { get; set; }
+
+    [NotMapped]
+    public bool IsPreviewable => PreviewableMimeTypes.Contains(MimeType);
 }
 
 public sealed class DbUrlMaterial : DbMaterial

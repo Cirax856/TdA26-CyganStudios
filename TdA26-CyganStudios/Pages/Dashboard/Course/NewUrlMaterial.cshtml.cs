@@ -43,6 +43,9 @@ public class NewUrlMaterialModel : PageModel
         [Required]
         [Display(Name = "Url")]
         public string Url { get; set; } = null!;
+
+        [Display(Name = "Skip URL verification")]
+        public bool SkipUrlVerification { get; set; } = false;
     }
 
     public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
@@ -101,26 +104,29 @@ public class NewUrlMaterialModel : PageModel
                 return Page();
             }
 
-            HttpResponseMessage response;
-            try
+            if (!Input.SkipUrlVerification)
             {
-                response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
-                return Page();
-            }
-            catch (HttpRequestException)
-            {
-                ModelState.AddModelError(string.Empty, "Could not verify material url.");
-                return Page();
-            }
+                HttpResponseMessage response;
+                try
+                {
+                    response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
+                    return Page();
+                }
+                catch (HttpRequestException)
+                {
+                    ModelState.AddModelError(string.Empty, "Could not verify material url.");
+                    return Page();
+                }
 
-            if (!response.IsSuccessStatusCode)
-            {
-                ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
-                return Page();
+                if (!response.IsSuccessStatusCode)
+                {
+                    ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
+                    return Page();
+                }
             }
 
             var course = await _appDb.Courses

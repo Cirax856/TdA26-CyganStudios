@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using TdA26_CyganStudios.Services;
+using TdA26_CyganStudios.Services.Files;
 
 namespace TdA26_CyganStudios;
 
@@ -61,6 +65,17 @@ internal static class Program
         {
             client.Timeout = TimeSpan.FromSeconds(10);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+        });
+
+        builder.Services.AddSingleton<IFileService, LocalFileService>();
+
+        builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+
+        builder.Services.AddSingleton<MimeTypeToExtensionProvider>();
+
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
         });
 
         var app = builder.Build();

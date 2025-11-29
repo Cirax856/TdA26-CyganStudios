@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Db;
+using TdA26_CyganStudios.Services.Files;
 
 namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
@@ -13,12 +14,14 @@ public class IndexModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
+    private readonly IFileService _fileService;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public IndexModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<CourseNewModel> logger)
+    public IndexModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
+        _fileService = fileService;
         _logger = logger;
     }
 
@@ -66,7 +69,6 @@ public class IndexModel : PageModel
         }
 
         var course = await _appDb.Courses
-            .Include(course => course.Materials)
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 
         if (course is null)
@@ -79,7 +81,8 @@ public class IndexModel : PageModel
             return Redirect("/");
         }
 
-        var material = course.Materials.FirstOrDefault(material => material.Uuid == materialUuid);
+        var material = await _appDb.Materials
+            .FirstOrDefaultAsync(material => material.CourseId == CourseUuid && material.Uuid == materialUuid);
 
         if (material is null)
         {
@@ -90,6 +93,11 @@ public class IndexModel : PageModel
         {
             course.Materials.Remove(material);
             await _appDb.SaveChangesAsync();
+
+            if (material is DbFileMaterial fileMaterial)
+            {
+                await _fileService.DeleteAsync(fileMaterial.FileUuid);
+            }
 
             _logger.LogInformation("Material deleted.");
 

@@ -6,17 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using TdA26_CyganStudios.Models.Db;
 
-namespace TdA26_CyganStudios.Pages.Dashboard;
+namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
 [Authorize(Roles = "lecturer")]
-public class MaterialNewModel : PageModel
+public class NewUrlMaterialModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
     private readonly HttpClient _httpClient;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public MaterialNewModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IHttpClientFactory httpClientFactory, ILogger<CourseNewModel> logger)
+    public NewUrlMaterialModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IHttpClientFactory httpClientFactory, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;

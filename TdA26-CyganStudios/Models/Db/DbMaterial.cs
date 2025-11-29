@@ -38,7 +38,7 @@ public sealed class DbFileMaterial : DbMaterial
 
     public required string MimeType { get; set; }
 
-    public required int SizeInBytes { get; set; }
+    public required long SizeInBytes { get; set; }
 }
 
 public sealed class DbUrlMaterial : DbMaterial

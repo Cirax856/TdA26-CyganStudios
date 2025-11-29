@@ -9,10 +9,12 @@
 
     if (savedTheme === "light" || savedTheme === "dark") {
         root.setAttribute("data-theme", savedTheme);
+        root.setAttribute("data-bs-theme", savedTheme);
     } else {
         // Default to device preference
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+        root.setAttribute("data-bs-theme", prefersDark ? "dark" : "light");
     }
 
     updateIcon();
@@ -22,6 +24,7 @@
         const newTheme = current === "dark" ? "light" : "dark";
 
         root.setAttribute("data-theme", newTheme);
+        root.setAttribute("data-bs-theme", newTheme);
         localStorage.setItem("theme", newTheme);
 
         updateIcon();

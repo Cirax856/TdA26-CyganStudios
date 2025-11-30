@@ -18,7 +18,7 @@ public abstract class DbMaterial
 
     public required string Name { get; set; }
 
-    public required string Description { get; set; }
+    public required string? Description { get; set; }
 
     public required long CreatedAt { get; set; }
 
@@ -35,6 +35,10 @@ public abstract class DbMaterial
 
 public sealed class DbFileMaterial : DbMaterial
 {
+    public const long MaxFileSize = 30 * 1024 * 1024; // 30 MB
+
+    private static readonly FrozenSet<string> AllowedExtensions = FrozenSet.Create(StringComparer.InvariantCultureIgnoreCase, ".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mp3");
+
     private static readonly FrozenSet<string> PreviewableMimeTypes =
     [
         "application/pdf",
@@ -54,6 +58,9 @@ public sealed class DbFileMaterial : DbMaterial
 
     [NotMapped]
     public bool IsPreviewable => PreviewableMimeTypes.Contains(MimeType);
+
+    public static bool IsExtensionAllowed(string extension)
+        => AllowedExtensions.Contains(extension);
 }
 
 public sealed class DbUrlMaterial : DbMaterial

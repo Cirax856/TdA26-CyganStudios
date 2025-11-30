@@ -47,6 +47,7 @@ public sealed class CoursesController : ControllerBase
         var cancellationToken = HttpContext.RequestAborted;
 
         var course = await _appDb.Courses
+            .Include(course => course.Materials)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
 
@@ -55,7 +56,8 @@ public sealed class CoursesController : ControllerBase
             return NotFound(new ErrorResponse("The requested resource was not found."));
         }
 
-        return Ok(CourseDetail.FromCourse(course));
+        var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+        return Ok(CourseDetail.FromCourse(course, baseUrl));
     }
 
     [HttpPut("{courseId}")]

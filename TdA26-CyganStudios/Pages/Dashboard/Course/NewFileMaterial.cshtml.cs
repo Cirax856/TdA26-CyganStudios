@@ -14,10 +14,6 @@ namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 [Authorize(Roles = "lecturer")]
 public class NewFileMaterialModel : PageModel
 {
-    private const long MaxFileSize = 30 * 1024 * 1024; // 30 MB
-
-    private static readonly FrozenSet<string> AllowedExtensions = FrozenSet.Create(StringComparer.InvariantCultureIgnoreCase, ".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mp3");
-
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
     private readonly IFileService _fileService;
@@ -91,14 +87,14 @@ public class NewFileMaterialModel : PageModel
         var file = Input.File;
 
         // Validate extension
-        if (!AllowedExtensions.Contains(Path.GetExtension(file.FileName)))
+        if (!DbFileMaterial.IsExtensionAllowed(Path.GetExtension(file.FileName)))
         {
             ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.File)}", "Unsupported file type.");
             return Page();
         }
 
         // Validate size
-        if (file.Length > MaxFileSize)
+        if (file.Length > DbFileMaterial.MaxFileSize)
         {
             ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.File)}", "File is too large (max 30 MB).");
             return Page();

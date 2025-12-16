@@ -33,68 +33,57 @@
 </head>
 <body>
 	<div class="page-content">
-		<header>
-			<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-				<div class="container">
-					<a class="navbar-brand" asp-area="" asp-page="/Index">
-						<img src="/images/logo_1_light.svg" alt="Think different Academy Logo" class="logo-main" />
-					</a>
-					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-							aria-expanded="false" aria-label="Toggle navigation">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-						<ul class="navbar-nav flex-grow-1">
-							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-page="/courses">Courses</a>
-							</li>
-							@if (User.Identity is { IsAuthenticated: true } identity)
-							{
-								if (User.IsInRole("lecturer"))
-								{
-									<li class="nav-item">
-										<a class="nav-link text-dark" asp-area="" asp-page="/dashboard">Dashboard</a>
-									</li>
-								}
+		<header class="full-width flex vert-center space-between pad">
+            <a class="navbar-brand" asp-area="" asp-page="/Index">
+                <img src="/images/logo_1_light.svg" alt="Think different Academy Logo" class="logo-main">
+            </a>
 
-								<li class="nav-item">
-									<a class="nav-link text-dark" asp-area="" asp-page="/logout">Logout</a>
-								</li>
-								<li>Username: @identity.Name</li>
-							}
-							else
-							{
-								<li class="nav-item">
-									<a class="nav-link text-dark" asp-area="" asp-page="/login">Login</a>
-								</li>
-							}
-							<li class="nav-item">
-								<button id="theme-toggle" class="btn nav-link" type="button">
-									<i id="theme-icon" class="bi bi-circle-half"></i>
-								</button>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</nav>
+            <ul class="flex vert-center gap no-deco">
+				<li class="nav-item">
+					<a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link text-dark" asp-area="" asp-page="/courses">Courses</a>
+				</li>
+				@if (User.Identity is { IsAuthenticated: true } identity)
+				{
+					if (User.IsInRole("lecturer"))
+					{
+						<li class="nav-item">
+						    <a class="nav-link text-dark" asp-area="" asp-page="/dashboard">Dashboard</a>
+					    </li>
+				    }
+                    <li>Username: <span class="colored-text">@identity.Name</span></li>
+					<li class="nav-item">
+						<a class="nav-link text-dark" asp-area="" asp-page="/logout">Logout</a>
+					</li>
+				}
+				else
+				{
+				    <li class="nav-item">
+					    <a class="nav-link text-dark" asp-area="" asp-page="/login">Login</a>
+				    </li>
+                }
+				<li class="nav-item">
+                    <button id="theme-toggle" class="btn nav-link no-outline" type="button">
+						<i id="theme-icon" class="bi bi-circle-half"></i>
+					</button>
+				</li>
+			</ul>
 		</header>
-		<div class="container">
+		<div class="full-width full-height flex vert-center horiz-center">
 			<main role="main" class="pb-3">
 				@RenderBody()
 			</main>
 		</div>
 	</div>
 
-	<footer class="border-top footer text-muted">
-		<div class="container">
-			&copy; 2025 - CyganStudios - <a asp-area="" asp-page="/Privacy">Privacy</a>
-		</div>
+	<footer class="full-width flex space-around vert-center">
+        <div class="flex vert-center space-around">
+            <hr>
+            <span>&copy; 2025 - CyganStudios - <a class="colored-text" asp-area="" asp-page="/Privacy">Privacy</a></span>
+            <hr>
+        </div>
 	</footer>
 
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>

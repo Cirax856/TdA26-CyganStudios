@@ -6,16 +6,16 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<div>
-	<a href="dashboard/courseNew">New course</a>
+<div class="margin-bottom">
+	<a class="sm-pad sm-pad-side green-bg no-link-deco md-border-radius" href="dashboard/courseNew">NEW COURSE</a>
 </div>
 
 <div>
 	<form method="get" class="mb-3">
-		<div class="input-group">
-			<input type="text" name="SearchString" value="@Model.SearchString" class="form-control" placeholder="Search by name or description..." />
-			<button type="submit" class="btn btn-primary">Search</button>
-		</div>
+        <div class="flex gap md-width bg-border-radius thin-border sm-pad pad-left">
+            <i class="bi bi-search"></i>
+            <input class="no-style-input flex-rest" type="text" name="SearchString" value="@Model.SearchString" placeholder="Search by name or description..." />
+        </div>
 	</form>
 
 	<br />
@@ -46,7 +46,7 @@
 							<h5 class="card-title text-primary">
 								<a asp-page="/Dashboard/Course/Index"
 								   asp-route-courseUuid="@course.Uuid"
-								   class="text-decoration-none">
+								   class="text-decoration-none no-link-deco">
 									@Html.DisplayFor(modelItem => course.Name)
 								</a>
 							</h5>

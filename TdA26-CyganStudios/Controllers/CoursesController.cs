@@ -24,7 +24,7 @@ public sealed class CoursesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<CourseSummary> CreateCourse(CourseCreateRequest request)
+    public async Task<CourseSummary> CreateCourse([FromBody] CourseCreateRequest request)
     {
         Debug.Assert(request is not null);
 
@@ -61,7 +61,7 @@ public sealed class CoursesController : ControllerBase
     }
 
     [HttpPut("{courseId}")]
-    public async Task<IActionResult> UpdateCourse(Guid courseId, CourseUpdateRequest request)
+    public async Task<IActionResult> UpdateCourse(Guid courseId, [FromBody] CourseUpdateRequest request)
     {
         Debug.Assert(request is not null);
 

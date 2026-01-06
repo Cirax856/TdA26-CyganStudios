@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Api;
+using TdA26_CyganStudios.Models.Db;
 
 namespace TdA26_CyganStudios.Controllers;
 
@@ -17,21 +18,12 @@ public sealed class QuizzesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Results<Ok<IEnumerable<Quiz>>, NotFound>> GetQuizzes(Guid courseId)
+    public async Task<Ok<IEnumerable<Quiz>>> GetQuizzes(Guid courseId)
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        var course = await _appDb.Courses
-            .Include(course => course.Quizzes)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
-
-        if (course is null)
-        {
-            return TypedResults.NotFound();
-        }
-
-        throw new NotImplementedException();
+        return TypedResults.Ok((IEnumerable<Quiz>)_appDb.Quizzes
+            .Where(quiz => quiz.CourseId == courseId));
     }
 
     [HttpPost]
@@ -47,7 +39,12 @@ public sealed class QuizzesController : ControllerBase
             return TypedResults.NotFound();
         }
 
-        throw new NotImplementedException();
+        var dbQuiz = quiz.ToQuiz(courseId);
+
+        _appDb.Quizzes.Add(dbQuiz);
+        await _appDb.SaveChangesAsync(cancellationToken);
+
+        return TypedResults.Created($"/api/courses/{courseId}/quizzes/{dbQuiz.Uuid}", Quiz.FromQuiz(dbQuiz));
     }
 
     [HttpGet("{quizId}")]
@@ -63,23 +60,27 @@ public sealed class QuizzesController : ControllerBase
             return TypedResults.NotFound();
         }
 
-        throw new NotImplementedException();
+        return TypedResults.Ok(Quiz.FromQuiz(quiz));
     }
 
     [HttpPut("{quizId}")]
-    public async Task<Results<Ok<Quiz>, NotFound>> UpdateQuiz(Guid courseId, Guid quizId)
+    public async Task<Results<Ok<Quiz>, NotFound>> UpdateQuiz([FromRoute] Guid courseId, [FromRoute] Guid quizId, [FromBody] Quiz quiz)
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        var quiz = await _appDb.Quizzes
+        var dbQuiz = await _appDb.Quizzes
             .FirstOrDefaultAsync(quiz => quiz.Uuid == quizId && quiz.CourseId == courseId, cancellationToken);
 
-        if (quiz is null)
+        if (dbQuiz is null)
         {
             return TypedResults.NotFound();
         }
 
-        throw new NotImplementedException();
+        quiz.AssignTo(dbQuiz);
+
+        await _appDb.SaveChangesAsync();
+
+        return TypedResults.Ok(Quiz.FromQuiz(dbQuiz));
     }
 
     [HttpDelete("{quizId}")]
@@ -102,7 +103,7 @@ public sealed class QuizzesController : ControllerBase
     }
 
     [HttpPost("{quizId}/submit")]
-    public async Task<Results<Ok, NotFound>> SubmitQuiz(Guid courseId, Guid quizId)
+    public async Task<Results<Ok<QuizSubmitResponse>, NotFound>> SubmitQuiz([FromRoute] Guid courseId, [FromRoute] Guid quizId, [FromBody] QuizSubmitRequest request)
     {
         var cancellationToken = HttpContext.RequestAborted;
 
@@ -112,6 +113,69 @@ public sealed class QuizzesController : ControllerBase
         if (quiz is null)
         {
             return TypedResults.NotFound();
+        }
+
+        bool[] correctPerQuestion = new bool[quiz.Questions.Count];
+        int score = 0;
+        int maxScore = 0;
+
+        int index = 0;
+        foreach (var answer in request.Answers)
+        {
+            int questionIndex;
+            if (answer.Uuid is { } uuid)
+            {
+                questionIndex = -1;
+
+                for (int i = 0; i < quiz.Questions.Count; i++)
+                {
+                    if (quiz.Questions[i].Uuid == uuid)
+                    {
+                        questionIndex = i;
+                        break;
+                    }
+                }
+
+                if (questionIndex is -1)
+                {
+                    questionIndex = index;
+                }
+            }
+            else
+            {
+                questionIndex = index;
+            }
+
+            var question = quiz.Questions[questionIndex];
+            if (question.IsMultiChoice)
+            {
+                maxScore += question.CorrectIndices.Count();
+
+                int correctCout = 0;
+                foreach (var item in question.CorrectIndices.Order().Zip((answer.SelectedIndices ?? (IEnumerable<int>)[answer.SelectedIndex ?? 0]).Order()))
+                {
+                    if (item.First == item.Second)
+                    {
+                        correctCout++;
+                    }
+                }
+
+                throw new NotImplementedException();
+            }
+            else
+            {
+                maxScore++;
+
+                var choice = answer.SelectedIndex ?? answer.SelectedIndices?.FirstOrDefault();
+
+                if (choice is not null && question.CorrectIndices.First() == choice.Value)
+                {
+                    correctPerQuestion[index] = true;
+                    score++;
+                }
+            }
+
+            index++;
         }
 
         throw new NotImplementedException();

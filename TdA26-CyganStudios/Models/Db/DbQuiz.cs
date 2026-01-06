@@ -6,7 +6,7 @@ namespace TdA26_CyganStudios.Models.Db;
 public class DbQuiz
 {
     [Key]
-    public Guid Uuid { get; set; } = Guid.NewGuid();
+    public Guid Uuid { get; set; } = Guid.CreateVersion7();
 
     public Guid CourseId { get; set; }
 
@@ -17,5 +17,7 @@ public class DbQuiz
     
     public int? AttemptsCount { get; set; }
 
-    // todo: options
+    public IList<DbQuestion> Questions { get; set; }
+
+    public ICollection<DbQuizSubmision> Submisions { get; set; } = [];
 }

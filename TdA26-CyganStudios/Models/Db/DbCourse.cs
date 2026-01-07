@@ -26,6 +26,8 @@ public class DbCourse
 
     public ICollection<DbQuiz> Quizzes { get; set; } = [];
 
+    public ICollection<DbFeedItem> FeedItems { get; set; } = [];
+
     [NotMapped]
     public DateTimeOffset CreatedAtDT
     {

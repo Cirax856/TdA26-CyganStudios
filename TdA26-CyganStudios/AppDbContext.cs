@@ -27,6 +27,8 @@ public sealed class AppDbContext : IdentityDbContext<IdentityUser<int>, Identity
 
     public DbSet<DbQuizSubmision> QuizSubmisions { get; set; }
 
+    public DbSet<DbFeedItem> FeedItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -52,6 +54,12 @@ public sealed class AppDbContext : IdentityDbContext<IdentityUser<int>, Identity
             .HasMany(c => c.Quizzes)
             .WithOne(q => q.Course)
             .HasForeignKey(q => q.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<DbCourse>()
+            .HasMany(c => c.FeedItems)
+            .WithOne(f => f.Course)
+            .HasForeignKey(f => f.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // DbQuiz

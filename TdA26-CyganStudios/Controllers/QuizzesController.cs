@@ -33,6 +33,7 @@ public sealed class QuizzesController : ControllerBase
         var cancellationToken = HttpContext.RequestAborted;
 
         var course = await _appDb.Courses
+            .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
 
         if (course is null)

@@ -80,6 +80,8 @@ internal static class Program
 
         builder.Services.AddSingleton<MimeTypeToExtensionProvider>();
 
+        builder.Services.AddSingleton<SseConnectionManager>();
+
         builder.WebHost.ConfigureKestrel(options =>
         {
             options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB

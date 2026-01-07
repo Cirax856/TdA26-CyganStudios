@@ -37,7 +37,8 @@ public sealed class FeedController : ControllerBase
         var cancellationToken = HttpContext.RequestAborted;
 
         return TypedResults.Ok(((IEnumerable<DbFeedItem>)_appDb.FeedItems
-            .Where(feedItem => feedItem.CourseId == courseId))
+            .Where(feedItem => feedItem.CourseId == courseId)
+            .OrderByDescending(feedItem => feedItem.CreatedAt))
             .Select(FeedItem.FromFeedItem));
     }
 

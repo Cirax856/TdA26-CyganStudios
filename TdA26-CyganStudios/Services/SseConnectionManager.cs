@@ -19,12 +19,20 @@ public sealed class SseConnectionManager
 
     public void RemoveCourseConnection(Guid courseId, long id)
     {
-        _courseConnections[courseId].TryRemove(id, out _);
+        if (_courseConnections.TryGetValue(courseId, out var connections))
+        {
+            connections.TryRemove(id, out _);
+        }
     }
 
     public async Task BroadcastCourseAsync(Guid courseId, string eventName, string data, CancellationToken cancellationToken = default)
     {
-        foreach (var kvp in _courseConnections[courseId])
+        if (!_courseConnections.TryGetValue(courseId, out var connections) || connections.IsEmpty)
+        {
+            return; // no connected clients
+        }
+
+        foreach (var kvp in connections)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

@@ -62,7 +62,7 @@ public sealed class AppDbContext : IdentityDbContext<IdentityUser<int>, Identity
         var questionsValueComparer = new ValueComparer<IList<DbQuestion>>(
             (c1, c2) => c1.SequenceEqual(c2),
             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-            c => c.Select(q => new DbQuestion(q.Uuid, q.Name, q.Question, q.Options.ToArray(), q.IsMultiChoice, q.CorrectIndices.ToArray())).ToList());
+            c => c.Select(q => new DbQuestion(q.Uuid, q.Question, q.Options.ToArray(), q.IsMultiChoice, q.CorrectIndices.ToArray())).ToList());
 
         builder.Entity<DbQuiz>()
             .Property(q => q.Questions)

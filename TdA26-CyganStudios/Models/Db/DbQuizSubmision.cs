@@ -14,4 +14,16 @@ public class DbQuizSubmision
     public DbQuiz Quiz { get; set; }
 
     public IList<DbQuizAnswer> Answers { get; set; }
+
+    public required long SubmitedAt { get; set; }
+
+    [NotMapped]
+    public DateTimeOffset SubmitedAtDT
+    {
+        get => DateTimeOffset.FromUnixTimeMilliseconds(SubmitedAt);
+        set
+        {
+            SubmitedAt = value.ToUnixTimeMilliseconds();
+        }
+    }
 }

@@ -108,6 +108,8 @@ public sealed class QuizzesController : ControllerBase
     {
         var cancellationToken = HttpContext.RequestAborted;
 
+        var now = DateTimeOffset.UtcNow;
+
         var quiz = await _appDb.Quizzes
             .FirstOrDefaultAsync(quiz => quiz.Uuid == quizId && quiz.CourseId == courseId, cancellationToken);
 
@@ -116,6 +118,8 @@ public sealed class QuizzesController : ControllerBase
             return TypedResults.NotFound();
         }
 
+        var answers = new DbQuizAnswer[quiz.Questions.Count];
+
         bool[] correctPerQuestion = new bool[quiz.Questions.Count];
         int score = 0;
         int maxScore = 0;
@@ -123,45 +127,53 @@ public sealed class QuizzesController : ControllerBase
         int index = 0;
         foreach (var answer in request.Answers)
         {
-            int questionIndex;
-            if (answer.Uuid is { } uuid)
-            {
-                questionIndex = -1;
+            int questionIndex = index;
+            //     if (answer.Uuid is { } uuid)
+            //     {
+            //         questionIndex = -1;
 
-                for (int i = 0; i < quiz.Questions.Count; i++)
-                {
-                    if (quiz.Questions[i].Uuid == uuid)
-                    {
-                        questionIndex = i;
-                        break;
-                    }
-                }
+            //         for (int i = 0; i < quiz.Questions.Count; i++)
+            //         {
+            //             if (quiz.Questions[i].Uuid == uuid)
+            //             {
+            //                 questionIndex = i;
+            //                 break;
+            //             }
+            //         }
 
-                if (questionIndex is -1)
-                {
-                    questionIndex = index;
-                }
-            }
-            else
-            {
-                questionIndex = index;
-            }
+            //         if (questionIndex is -1)
+            //         {
+            //             questionIndex = index;
+            //         }
+            //     }
+            //     else
+            //     {
+            //         questionIndex = index;
+            //     }
+
+            answers[questionIndex] = new DbQuizAnswer(answer.Uuid, answer.SelectedIndices?.ToArray() ?? [answer.SelectedIndex ?? 0], answer.Comment);
 
             var question = quiz.Questions[questionIndex];
             if (question.IsMultiChoice)
             {
-                maxScore += question.CorrectIndices.Count();
+                int maxCorrectCount = question.CorrectIndices.Count();
+                maxScore += maxCorrectCount;
 
-                int correctCout = 0;
+                int correctCount = 0;
                 foreach (var item in question.CorrectIndices.Order().Zip((answer.SelectedIndices ?? (IEnumerable<int>)[answer.SelectedIndex ?? 0]).Order()))
                 {
                     if (item.First == item.Second)
                     {
-                        correctCout++;
+                        correctCount++;
                     }
                 }
 
-                throw new NotImplementedException();
+                if (correctCount == maxCorrectCount)
+                {
+                    correctPerQuestion[index] = true;
+                }
+
+                score += correctCount;
             }
             else
             {
@@ -179,6 +191,24 @@ public sealed class QuizzesController : ControllerBase
             index++;
         }
 
-        throw new NotImplementedException();
+        for (int i = 0; i < answers.Length; i++)
+        {
+            if (answers[i] is null)
+            {
+                answers[i] = new DbQuizAnswer(null, [0], null);
+            }
+        }
+
+        var submission = new DbQuizSubmision()
+        {
+            QuizId = quizId,
+            Answers = answers,
+            SubmitedAt = now.ToUnixTimeMilliseconds(),
+        };
+
+        _appDb.QuizSubmisions.Add(submission);
+        await _appDb.SaveChangesAsync(cancellationToken);
+
+        return TypedResults.Ok(new QuizSubmitResponse(quizId, score, maxScore, correctPerQuestion, now.DateTime));
     }
 }

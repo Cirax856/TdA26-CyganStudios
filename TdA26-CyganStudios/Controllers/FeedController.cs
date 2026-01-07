@@ -90,8 +90,16 @@ public sealed class FeedController : ControllerBase
             return TypedResults.NotFound();
         }
 
-        feedItem.Message = request.Messsage!;
-        feedItem.Edited = request.Edited ?? true;
+        if (request.Messsage is { } message)
+        {
+            feedItem.Message = message;
+        }
+
+        if (request.Edited is { } edited)
+        {
+            feedItem.Edited = edited;
+        }
+
         feedItem.UpdatedAtDT = now;
 
         await _appDb.SaveChangesAsync(cancellationToken);
@@ -121,7 +129,7 @@ public sealed class FeedController : ControllerBase
         await _appDb.SaveChangesAsync(cancellationToken);
 
         await _sseConnectionManager.BroadcastCourseAsync(courseId, "delete_post", JsonSerializer.Serialize(new DeletePost(feedItem.Uuid), feedSerializerOptions));
-        
+
         return TypedResults.NoContent();
     }
 

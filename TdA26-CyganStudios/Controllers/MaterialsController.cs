@@ -16,13 +16,15 @@ namespace TdA26_CyganStudios.Controllers;
 public sealed class MaterialsController : ControllerBase
 {
     private readonly AppDbContext _appDb;
+    private readonly FeedManager _feedManager;
     private readonly IFileService _fileService;
     private readonly FileExtensionContentTypeProvider _fileExtensionTypeProvider;
     private readonly MimeTypeToExtensionProvider _mimeTypeToExtension;
 
-    public MaterialsController(AppDbContext appDb, IFileService fileService, FileExtensionContentTypeProvider fileExtensionTypeProvider, MimeTypeToExtensionProvider mimeTypeToExtension)
+    public MaterialsController(AppDbContext appDb, FeedManager feedManager, IFileService fileService, FileExtensionContentTypeProvider fileExtensionTypeProvider, MimeTypeToExtensionProvider mimeTypeToExtension)
     {
         _appDb = appDb;
+        _feedManager = feedManager;
         _fileService = fileService;
         _fileExtensionTypeProvider = fileExtensionTypeProvider;
         _mimeTypeToExtension = mimeTypeToExtension;
@@ -106,6 +108,8 @@ public sealed class MaterialsController : ControllerBase
         course.Materials.Add(material);
         await _appDb.SaveChangesAsync(cancellationToken);
 
+        await _feedManager.NewCoursePostAsync(courseId, "New material was uploaded", FeedItemType.System); // TODO: name and link
+
         var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
         return TypedResults.Created($"/api/courses/{courseId}/materials/{material.Uuid}", Material.FromMaterial(material, baseUrl));
     }
@@ -150,6 +154,8 @@ public sealed class MaterialsController : ControllerBase
 
         course.Materials.Add(material);
         await _appDb.SaveChangesAsync(cancellationToken);
+        
+        await _feedManager.NewCoursePostAsync(courseId, "New material was uploaded", FeedItemType.System); // TODO: name and link
 
         var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
         return TypedResults.Created($"/api/courses/{courseId}/materials/{material.Uuid}", Material.FromMaterial(material, baseUrl));

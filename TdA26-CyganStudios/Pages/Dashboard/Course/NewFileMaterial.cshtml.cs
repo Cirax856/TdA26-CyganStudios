@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Frozen;
 using System.ComponentModel.DataAnnotations;
+using TdA26_CyganStudios.Models.Api;
 using TdA26_CyganStudios.Models.Db;
+using TdA26_CyganStudios.Services;
 using TdA26_CyganStudios.Services.Files;
 
 namespace TdA26_CyganStudios.Pages.Dashboard.Course;
@@ -18,14 +20,16 @@ public class NewFileMaterialModel : PageModel
     private readonly AppDbContext _appDb;
     private readonly IFileService _fileService;
     private readonly FileExtensionContentTypeProvider _fileExtensionTypeProvider;
+    private readonly FeedManager _feedManager;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public NewFileMaterialModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, FileExtensionContentTypeProvider fileExtensionTypeProvider, ILogger<CourseNewModel> logger)
+    public NewFileMaterialModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, FileExtensionContentTypeProvider fileExtensionTypeProvider, FeedManager feedManager, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
         _fileService = fileService;
         _fileExtensionTypeProvider = fileExtensionTypeProvider;
+        _feedManager = feedManager;
         _logger = logger;
     }
 
@@ -138,6 +142,8 @@ public class NewFileMaterialModel : PageModel
             CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
         });
         await _appDb.SaveChangesAsync(cancellationToken);
+
+        await _feedManager.NewCoursePostAsync(course.Uuid, "New material was uploaded", FeedItemType.System); // TODO: name and link
 
         _logger.LogInformation("Material created.");
         return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });

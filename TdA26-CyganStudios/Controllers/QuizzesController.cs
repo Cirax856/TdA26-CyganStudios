@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Api;
 using TdA26_CyganStudios.Models.Db;
+using TdA26_CyganStudios.Services;
 
 namespace TdA26_CyganStudios.Controllers;
 
@@ -11,10 +12,12 @@ namespace TdA26_CyganStudios.Controllers;
 public sealed class QuizzesController : ControllerBase
 {
     private readonly AppDbContext _appDb;
+    private readonly FeedManager _feedManager;
 
-    public QuizzesController(AppDbContext appDb)
+    public QuizzesController(AppDbContext appDb, FeedManager feedManager)
     {
         _appDb = appDb;
+        _feedManager = feedManager;
     }
 
     [HttpGet]
@@ -45,6 +48,8 @@ public sealed class QuizzesController : ControllerBase
 
         _appDb.Quizzes.Add(dbQuiz);
         await _appDb.SaveChangesAsync(cancellationToken);
+
+        await _feedManager.NewCoursePostAsync(courseId, "New quiz was created", FeedItemType.System); // TODO: title and link
 
         return TypedResults.Created($"/api/courses/{courseId}/quizzes/{dbQuiz.Uuid}", Quiz.FromQuiz(dbQuiz));
     }

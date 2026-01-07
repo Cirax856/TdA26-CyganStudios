@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using TdA26_CyganStudios.Models.Api;
 using TdA26_CyganStudios.Models.Db;
+using TdA26_CyganStudios.Services;
 
 namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
@@ -14,13 +16,15 @@ public class NewUrlMaterialModel : PageModel
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
     private readonly HttpClient _httpClient;
+    private readonly FeedManager _feedManager;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public NewUrlMaterialModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IHttpClientFactory httpClientFactory, ILogger<CourseNewModel> logger)
+    public NewUrlMaterialModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IHttpClientFactory httpClientFactory, FeedManager feedManager, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
         _httpClient = httpClientFactory.CreateClient("course_material_verify");
+        _feedManager = feedManager;
         _logger = logger;
     }
 
@@ -146,6 +150,8 @@ public class NewUrlMaterialModel : PageModel
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             });
             await _appDb.SaveChangesAsync(cancellationToken);
+
+            await _feedManager.NewCoursePostAsync(course.Uuid, "New material was uploaded", FeedItemType.System); // TODO: name and link
 
             _logger.LogInformation("Material created.");
             return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using System.Net;
 using TdA26_CyganStudios.Models.Db;
@@ -58,11 +59,17 @@ public sealed class AppDbContext : IdentityDbContext<IdentityUser<int>, Identity
             .Property(m => m.Uuid)
             .ValueGeneratedNever();
 
+        var questionsValueComparer = new ValueComparer<IList<DbQuestion>>(
+            (c1, c2) => c1.SequenceEqual(c2),
+            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+            c => c.Select(q => new DbQuestion(q.Uuid, q.Name, q.Question, q.Options.ToArray(), q.IsMultiChoice, q.CorrectIndices.ToArray())).ToList());
+
         builder.Entity<DbQuiz>()
             .Property(q => q.Questions)
             .HasConversion(
                 v => JsonConvert.SerializeObject(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }),
-                v => JsonConvert.DeserializeObject<IList<DbQuestion>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })!);
+                v => JsonConvert.DeserializeObject<IList<DbQuestion>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })!,
+                questionsValueComparer);
 
         builder.Entity<DbQuiz>()
             .HasMany(q => q.Submisions)
@@ -75,10 +82,16 @@ public sealed class AppDbContext : IdentityDbContext<IdentityUser<int>, Identity
             .Property(m => m.Uuid)
             .ValueGeneratedNever();
 
+        var answersValueComparer = new ValueComparer<IList<DbQuizAnswer>>(
+            (c1, c2) => c1.SequenceEqual(c2),
+            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+            c => c.Select(a => new DbQuizAnswer(a.Uuid, a.SelectedIndices == null ? null : a.SelectedIndices.ToArray(), a.Comment)).ToList());
+
         builder.Entity<DbQuizSubmision>()
             .Property(s => s.Answers)
             .HasConversion(
                 v => JsonConvert.SerializeObject(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }),
-                v => JsonConvert.DeserializeObject<IList<DbQuizAnswer>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })!);
+                v => JsonConvert.DeserializeObject<IList<DbQuizAnswer>>(v, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })!,
+                answersValueComparer);
     }
 }

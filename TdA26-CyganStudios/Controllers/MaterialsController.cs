@@ -50,7 +50,7 @@ public sealed class MaterialsController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<Results<Created<Material>, BadRequest, NotFound>> CreateFileMaterial([FromRoute] Guid courseId, [FromForm] FileMaterialCreateRequest request)
+    public async Task<Results<Created<Material>, BadRequest, BadRequest<object>, NotFound>> CreateFileMaterial([FromRoute] Guid courseId, [FromForm] FileMaterialCreateRequest request)
     {
         var cancellationToken = HttpContext.RequestAborted;
 
@@ -64,13 +64,13 @@ public sealed class MaterialsController : ControllerBase
         // Validate extension
         if (!DbFileMaterial.IsExtensionAllowed(Path.GetExtension(file.FileName)))
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { error = "Invalid file extension", });
         }
 
         // Validate size
         if (file.Length > DbFileMaterial.MaxFileSize)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { error = "File too large", });
         }
 
         var course = await _appDb.Courses

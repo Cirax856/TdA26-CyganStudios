@@ -145,6 +145,8 @@ public sealed class FeedController : ControllerBase
 
         try
         {
+            await _sseConnectionManager.SendPingAsync(courseId, connectionId);
+
             // Keep the connection alive
             while (!cancellationToken.IsCancellationRequested)
             {

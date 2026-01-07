@@ -25,6 +25,19 @@ public sealed class SseConnectionManager
         }
     }
 
+    public async Task SendPingAsync(Guid courseId, long connectionId)
+    {
+        if (!_courseConnections.TryGetValue(courseId, out var connections))
+        {
+            return; // no connected clients
+        }
+
+        if (connections.TryGetValue(connectionId, out var connection))
+        {
+            await connection.SendEventAsync("ping", $"{{ date: \"{DateTime.UtcNow}\" }}");
+        }
+    }
+
     public async Task BroadcastCourseAsync(Guid courseId, string eventName, string data, CancellationToken cancellationToken = default)
     {
         if (!_courseConnections.TryGetValue(courseId, out var connections) || connections.IsEmpty)

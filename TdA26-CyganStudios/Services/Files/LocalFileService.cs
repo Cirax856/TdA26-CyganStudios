@@ -13,7 +13,7 @@ internal sealed class LocalFileService : IFileService
 
     public async Task<Guid> CreateAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        var fileGuid = Guid.CreateVersion7();
+        var fileGuid = Guid.NewGuid();
 
         using (var fs = File.OpenWrite(GetFilePath(fileGuid)))
         {

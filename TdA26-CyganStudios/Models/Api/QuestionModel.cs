@@ -16,7 +16,7 @@ public abstract record QuestionModel(Guid? Uuid, string Name, string Question, I
     }
 
     public DbQuestion ToQuestion()
-        => new DbQuestion(Uuid ?? Guid.CreateVersion7(), Name, Question, Options, this is MultipleChoiceQuestion, (this as MultipleChoiceQuestion)?.CorrectIndices ?? [((SingleChoiceQuestion)this).CorrectIndex]);
+        => new DbQuestion(Uuid ?? Guid.NewGuid(), Name, Question, Options, this is MultipleChoiceQuestion, (this as MultipleChoiceQuestion)?.CorrectIndices ?? [((SingleChoiceQuestion)this).CorrectIndex]);
 }
 
 public sealed record SingleChoiceQuestion(Guid? Uuid, string Name, string Question, IEnumerable<string> Options, int CorrectIndex)

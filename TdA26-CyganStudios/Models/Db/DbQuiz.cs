@@ -6,7 +6,7 @@ namespace TdA26_CyganStudios.Models.Db;
 public class DbQuiz
 {
     [Key]
-    public Guid Uuid { get; set; } = Guid.CreateVersion7();
+    public Guid Uuid { get; set; } = Guid.NewGuid();
 
     public Guid CourseId { get; set; }
 

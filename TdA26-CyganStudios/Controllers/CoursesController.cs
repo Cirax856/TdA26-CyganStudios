@@ -48,6 +48,7 @@ public sealed class CoursesController : ControllerBase
 
         var course = await _appDb.Courses
             .Include(course => course.Materials)
+            .Include(course => course.Quizzes)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == courseId, cancellationToken);
 

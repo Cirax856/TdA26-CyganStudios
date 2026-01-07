@@ -90,7 +90,7 @@ public sealed class FeedController : ControllerBase
             return TypedResults.NotFound();
         }
 
-        if (request.Messsage is { } message)
+        if (request.Message is { } message)
         {
             feedItem.Message = message;
         }

@@ -1,3 +1,3 @@
 namespace TdA26_CyganStudios.Models.Api;
 
-public sealed record FeedUpdateRequest(string? Messsage, bool? Edited);
+public sealed record FeedUpdateRequest(string? Message, bool? Edited);

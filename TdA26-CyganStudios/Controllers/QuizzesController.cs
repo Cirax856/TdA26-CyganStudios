@@ -22,8 +22,9 @@ public sealed class QuizzesController : ControllerBase
     {
         var cancellationToken = HttpContext.RequestAborted;
 
-        return TypedResults.Ok((IEnumerable<Quiz>)_appDb.Quizzes
-            .Where(quiz => quiz.CourseId == courseId));
+        return TypedResults.Ok(((IEnumerable<DbQuiz>)_appDb.Quizzes
+            .Where(quiz => quiz.CourseId == courseId))
+            .Select(Quiz.FromQuiz));
     }
 
     [HttpPost]

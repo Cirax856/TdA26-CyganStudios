@@ -1,4 +1,4 @@
-@page "/dashboard/course/{courseUuid}/materials"
+@page "/courses/{courseUuid}/materials"
 @using TdA26_CyganStudios.Models.Db
 @using TdA26_CyganStudios.Utils
 @model TdA26_CyganStudios.Pages.Dashboard.Course.MaterialsModel
@@ -7,4 +7,4 @@
 }
 
 
-<partial name="_MaterialsGrid" model="new MaterialsGridModel(Model.CourseUuid, Model.Course.Materials, true)" />
+<partial name="_MaterialsGrid" model="new MaterialsGridModel(Model.CourseUuid, Model.Course.Materials, false)" />

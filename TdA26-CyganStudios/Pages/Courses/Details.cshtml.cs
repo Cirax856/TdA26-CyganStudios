@@ -23,6 +23,7 @@ public class DetailsModel : PageModel
     {
         var course = await _appDb.Courses
             .Include(course => course.Lecturer)
+            .Include(course => course.Materials)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 

@@ -8,3 +8,6 @@
 <h3>Lecturer: @Model.Course.Lecturer.UserName</h3>
 
 <p>@Model.Course.Description</p>
+
+<partial name="_MaterialsPreviewGrid"
+    model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, false)" />

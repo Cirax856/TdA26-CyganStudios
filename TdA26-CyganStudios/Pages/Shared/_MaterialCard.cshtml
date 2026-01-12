@@ -1,0 +1,80 @@
+@model MaterialCardModel
+@using System
+@using TdA26_CyganStudios.Models.Db
+@using TdA26_CyganStudios.Utils
+
+@{
+    var material = Model.Material;
+}
+
+<div class="card h-100 position-relative">
+    @if (Model.Editable)
+    {
+        <div class="dropdown position-absolute top-0 end-0 m-2">
+            <button class="btn btn-sm bg-body-secondary p-1 text-muted" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false" style="line-height: 1;">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" asp-page="/Dashboard/MaterialEdit" asp-route-courseUuid="@Model.CourseUuid"
+                        asp-route-materialUuid="@material.Uuid">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                </li>
+                <li>
+                    <form method="post" asp-page-handler="Delete" asp-route-itemUuid="@material.Uuid"
+                        asp-route-type="material"
+                        onsubmit="return confirm('Are you sure you want to delete this material?');">
+
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    }
+
+    <div class="card-body">
+        <h5 class="card-title mb-1">@material.Name</h5>
+        <p class="card-text text-muted mb-2">@material.Description</p>
+
+        @if (material is DbUrlMaterial url)
+        {
+            <div class="d-flex align-items-center gap-2 mt-1">
+                <img src="https://www.google.com/s2/favicons?domain=@(new Uri(url.Url).Host)&sz=32" alt="favicon" width="16"
+                    height="16" class="rounded" />
+                <a href="@url.Url" target="_blank" class="card-link">
+                    Open
+                </a>
+            </div>
+        }
+        else if (material is DbFileMaterial file)
+        {
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+
+                <span class="px-2 py-1 small text-muted border rounded-pill">
+                    @FileSize.ToString(file.SizeInBytes)
+                </span>
+
+                @if (file.IsPreviewable)
+                {
+                    <a href="/api/courses/@(material.CourseId)/materials/@(material.Uuid)/preview" target="_blank"
+                        class="card-link d-flex align-items-center gap-1">
+                        <i class="bi bi-eye"></i>
+                        Preview
+                    </a>
+                }
+
+                <a href="/api/courses/@(material.CourseId)/materials/@(material.Uuid)/download"
+                    class="card-link d-flex align-items-center gap-1">
+                    <i class="bi bi-download"></i>
+                    Download
+                </a>
+            </div>
+        }
+    </div>
+
+</div>

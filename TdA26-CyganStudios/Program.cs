@@ -81,7 +81,7 @@ internal static class Program
         builder.Services.AddSingleton<MimeTypeToExtensionProvider>();
 
         builder.Services.AddSingleton<SseConnectionManager>();
-        builder.Services.AddSingleton<FeedManager>();
+        builder.Services.AddScoped<FeedManager>();
 
         builder.WebHost.ConfigureKestrel(options =>
         {

@@ -60,8 +60,13 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostDeleteAsync(Guid materialUuid)
+    public async Task<IActionResult> OnPostDeleteAsync(Guid itemUuid, string type)
     {
+        if (type is not ("material" or "quiz"))
+        {
+            return BadRequest();
+        }
+
         var currentUser = await _userManager.GetUserAsync(User);
 
         if (currentUser is null)
@@ -82,32 +87,67 @@ public class IndexModel : PageModel
             return Redirect("/");
         }
 
-        var material = await _appDb.Materials
-            .FirstOrDefaultAsync(material => material.CourseId == CourseUuid && material.Uuid == materialUuid);
-
-        if (material is null)
+        switch (type)
         {
-            return NotFound();
-        }
+            case "material":
+                {
+                    var material = await _appDb.Materials
+                        .FirstOrDefaultAsync(material => material.CourseId == CourseUuid && material.Uuid == itemUuid);
 
-        try
-        {
-            course.Materials.Remove(material);
-            await _appDb.SaveChangesAsync();
+                    if (material is null)
+                    {
+                        return NotFound();
+                    }
 
-            if (material is DbFileMaterial fileMaterial)
-            {
-                await _fileService.DeleteAsync(fileMaterial.FileUuid);
-            }
+                    try
+                    {
+                        course.Materials.Remove(material);
+                        await _appDb.SaveChangesAsync();
 
-            _logger.LogInformation("Material deleted.");
+                        if (material is DbFileMaterial fileMaterial)
+                        {
+                            await _fileService.DeleteAsync(fileMaterial.FileUuid);
+                        }
 
-            TempData["SuccessMessage"] = $"Material '{material.Name}' deleted successfully.";
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Error deleting material {MaterialUuid} for user {UserId}.", materialUuid, currentUser.Id);
-            TempData["ErrorMessage"] = "An error occurred while deleting the material.";
+                        _logger.LogInformation("Material deleted.");
+
+                        TempData["SuccessMessage"] = $"Material '{material.Name}' deleted successfully.";
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        _logger.LogError(ex, "Error deleting material {MaterialUuid} for user {UserId}.", itemUuid, currentUser.Id);
+                        TempData["ErrorMessage"] = "An error occurred while deleting the material.";
+                    }
+                }
+
+                break;
+            case "quiz":
+                {
+                    var quiz = await _appDb.Quizzes
+                                         .FirstOrDefaultAsync(quiz => quiz.CourseId == CourseUuid && quiz.Uuid == itemUuid);
+
+                    if (quiz is null)
+                    {
+                        return NotFound();
+                    }
+
+                    try
+                    {
+                        course.Quizzes.Remove(quiz);
+                        await _appDb.SaveChangesAsync();
+
+                        _logger.LogInformation("Quiz deleted.");
+
+                        TempData["SuccessMessage"] = $"Quiz '{quiz.Title}' deleted successfully.";
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        _logger.LogError(ex, "Error deleting quiz {QuizlUuid} for user {UserId}.", itemUuid, currentUser.Id);
+                        TempData["ErrorMessage"] = "An error occurred while deleting the quiz.";
+                    }
+                }
+
+                break;
         }
 
         Course = course;

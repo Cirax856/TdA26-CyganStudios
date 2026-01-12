@@ -17,7 +17,19 @@ public class DbQuiz
     
     public int? AttemptsCount { get; set; }
 
+    public required long CreatedAt { get; set; }
+
     public IList<DbQuestion> Questions { get; set; }
 
     public ICollection<DbQuizSubmision> Submisions { get; set; } = [];
+
+    [NotMapped]
+    public DateTimeOffset CreatedAtDT
+    {
+        get => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt);
+        set
+        {
+            CreatedAt = value.ToUnixTimeMilliseconds();
+        }
+    }
 }

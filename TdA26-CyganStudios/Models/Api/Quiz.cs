@@ -15,6 +15,7 @@ public sealed record Quiz(Guid? Uuid, string Title, int? AttemptsCount, IEnumera
             Title = Title,
             AttemptsCount = AttemptsCount,
             Questions = Questions.Select(q => q.ToQuestion()).ToList(),
+            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
         };
 
         if (Uuid is { } uuid)

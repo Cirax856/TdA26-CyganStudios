@@ -1,0 +1,287 @@
+@page "/dashboard/course/{courseUuid}/quiz_new"
+@model TdA26_CyganStudios.Pages.Dashboard.Course.NewQuizModel
+@{
+	ViewData["Title"] = "New Quiz";
+}
+
+<style>
+	.page-content>.full-height {
+		height: auto !important;
+		min-height: 100vh;
+		align-items: flex-start !important;
+		padding-top: 2rem;
+		padding-bottom: 2rem;
+	}
+</style>
+
+<div class="container-fluid" style="max-width: 1400px;">
+
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1 class="h3 mb-0">Create New Quiz</h1>
+		<a href="/dashboard/course/@Model.CourseUuid" class="btn btn-outline-secondary">Cancel</a>
+	</div>
+
+	<form method="post" id="quizForm">
+		<div class="card shadow-sm mb-4">
+			<div class="card-header bg-body-tertiary">
+				<h5 class="card-title mb-0">Quiz Details</h5>
+			</div>
+			<div class="card-body">
+				<div class="row g-3">
+					<div class="col-md-8">
+						<label asp-for="Input.Title" class="form-label">Quiz Title</label>
+						<input asp-for="Input.Title" class="form-control" placeholder="quiz title..." />
+						<span asp-validation-for="Input.Title" class="text-danger"></span>
+					</div>
+					<div class="col-md-4">
+						<label asp-for="Input.AttemptsCount" class="form-label">Max Attempts</label>
+						<input asp-for="Input.AttemptsCount" class="form-control" placeholder="Unlimited" />
+						<div class="form-text">Leave blank for unlimited.</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="questions-container">
+			@for (int i = 0; i < Model.Input.Questions.Count; i++)
+			{
+				<div class="card shadow-sm mb-4 question-block" data-index="@i">
+					<div class="card-body">
+						<div class="d-flex justify-content-between mb-3">
+							<h6 class="fw-bold text-primary">Question #<span class="q-number">@(i + 1)</span></h6>
+							<button type="button" class="btn btn-sm btn-outline-danger remove-question">
+								<i class="bi bi-trash"></i> Remove
+							</button>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label">Question Text</label>
+							<input name="Input.Questions[@i].QuestionText" value="@Model.Input.Questions[i].QuestionText"
+								class="form-control" placeholder="Enter your question here..." />
+						</div>
+
+						<div class="form-check form-switch mb-3">
+							<input class="form-check-input q-multichoice" type="checkbox"
+								name="Input.Questions[@i].IsMultiChoice" value="true"
+								@(Model.Input.Questions[i].IsMultiChoice ? "checked" : "")>
+							<label class="form-check-label">Allow Multiple Correct Answers</label>
+							<input type="hidden" name="Input.Questions[@i].IsMultiChoice" value="false" />
+						</div>
+
+						<label class="form-label">Answer Options</label>
+						<div class="options-container">
+							@for (int j = 0; j < Model.Input.Questions[i].Options.Count; j++)
+							{
+								<div class="input-group mb-2 option-row">
+									<div class="input-group-text">
+										<input class="form-check-input mt-0 opt-is-correct" type="checkbox"
+											name="Input.Questions[@i].Options[@j].IsCorrect" value="true"
+											@(Model.Input.Questions[i].Options[j].IsCorrect ? "checked" : "")>
+										<input type="hidden" name="Input.Questions[@i].Options[@j].IsCorrect" value="false" />
+									</div>
+									<input type="text" name="Input.Questions[@i].Options[@j].OptionText"
+										value="@Model.Input.Questions[i].Options[j].OptionText" class="form-control"
+										placeholder="Option text">
+									<button class="btn btn-outline-secondary remove-option" type="button">&times;</button>
+								</div>
+							}
+						</div>
+						<button type="button" class="btn btn-sm btn-link text-decoration-none px-0 add-option">
+							+ Add another option
+						</button>
+					</div>
+				</div>
+			}
+		</div>
+
+		<div class="d-grid gap-2 mb-5">
+			<button type="button" id="add-question-btn" class="btn btn-outline-primary border-2 border-dashed py-3">
+				<i class="bi bi-plus-circle"></i> Add New Question
+			</button>
+		</div>
+
+		<div class="d-flex justify-content-end gap-2 mb-5">
+			<button type="submit" class="btn btn-primary btn-lg px-5">Save Quiz</button>
+		</div>
+	</form>
+</div>
+
+<template id="question-template">
+	<div class="card shadow-sm mb-4 question-block">
+		<div class="card-body">
+			<div class="d-flex justify-content-between mb-3">
+				<h6 class="fw-bold text-primary">Question #<span class="q-number"></span></h6>
+				<button type="button" class="btn btn-sm btn-outline-danger remove-question">
+					<i class="bi bi-trash"></i> Remove
+				</button>
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Question Text</label>
+				<input type="text" class="form-control q-text-input" placeholder="Enter your question here..."
+					required />
+			</div>
+			<div class="form-check form-switch mb-3">
+				<input class="form-check-input q-multichoice" type="checkbox" value="true">
+				<label class="form-check-label">Allow Multiple Correct Answers</label>
+			</div>
+			<label class="form-label">Answer Options</label>
+			<div class="options-container"></div>
+			<button type="button" class="btn btn-sm btn-link text-decoration-none px-0 add-option">+ Add another
+				option</button>
+		</div>
+	</div>
+</template>
+
+<template id="option-template">
+	<div class="input-group mb-2 option-row">
+		<div class="input-group-text">
+			<input class="form-check-input mt-0 opt-is-correct" type="checkbox" value="true">
+		</div>
+		<input type="text" class="form-control opt-text" placeholder="Option text" required>
+		<button class="btn btn-outline-secondary remove-option" type="button">&times;</button>
+	</div>
+</template>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const questionsContainer = document.getElementById('questions-container');
+			const addQuestionBtn = document.getElementById('add-question-btn');
+			const questionTemplate = document.getElementById('question-template');
+			const optionTemplate = document.getElementById('option-template');
+
+			addQuestionBtn.addEventListener('click', () => {
+				const clone = questionTemplate.content.cloneNode(true);
+				const qBlock = clone.querySelector('.question-block');
+				const optsContainer = qBlock.querySelector('.options-container');
+
+				addOptionToContainer(optsContainer);
+				addOptionToContainer(optsContainer);
+
+				const firstCheck = optsContainer.querySelector('.opt-is-correct');
+				if (firstCheck) firstCheck.checked = true;
+
+				questionsContainer.appendChild(clone);
+				reindexAll();
+			});
+
+			questionsContainer.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.closest('.remove-question')) {
+					target.closest('.question-block').remove();
+					reindexAll();
+				} else if (target.closest('.add-option')) {
+					const block = target.closest('.question-block');
+					addOptionToContainer(block.querySelector('.options-container'));
+					reindexAll();
+				} else if (target.closest('.remove-option')) {
+					const row = target.closest('.option-row');
+					if (row.parentElement.querySelectorAll('.option-row').length > 1) {
+						row.remove();
+						reindexAll();
+					}
+				}
+			});
+
+			questionsContainer.addEventListener('change', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('q-multichoice')) {
+					handleMultiChoiceToggle(target);
+				}
+
+				if (target.classList.contains('opt-is-correct')) {
+					handleAnswerCheck(target);
+				}
+			});
+
+			function handleMultiChoiceToggle(toggleInput) {
+				const isMulti = toggleInput.checked;
+				const qBlock = toggleInput.closest('.question-block');
+				const allOptions = qBlock.querySelectorAll('.opt-is-correct');
+				const checkedOptions = qBlock.querySelectorAll('.opt-is-correct:checked');
+
+				if (!isMulti) {
+					if (checkedOptions.length > 1) {
+						for (let i = 1; i < checkedOptions.length; i++) {
+							checkedOptions[i].checked = false;
+						}
+					} else if (checkedOptions.length === 0) {
+						if (allOptions.length > 0) allOptions[0].checked = true;
+					}
+				}
+			}
+
+			function handleAnswerCheck(checkbox) {
+				const qBlock = checkbox.closest('.question-block');
+				const isMulti = qBlock.querySelector('.q-multichoice').checked;
+				const allOptions = qBlock.querySelectorAll('.opt-is-correct');
+
+				if (!isMulti) {
+					if (checkbox.checked) {
+						allOptions.forEach(opt => {
+							if (opt !== checkbox) opt.checked = false;
+						});
+					} else {
+						const checkedCount = qBlock.querySelectorAll('.opt-is-correct:checked').length;
+						if (checkedCount === 0) {
+							checkbox.checked = true;
+						}
+					}
+				}
+			}
+
+			function addOptionToContainer(container) {
+				const clone = optionTemplate.content.cloneNode(true);
+				container.appendChild(clone);
+			}
+
+			function reindexAll() {
+				const questions = questionsContainer.querySelectorAll('.question-block');
+
+				questions.forEach((qBlock, qIndex) => {
+					qBlock.querySelector('.q-number').textContent = qIndex + 1;
+
+					setAttributes(qBlock.querySelector('.q-text-input'), `Input.Questions[${qIndex}].QuestionText`);
+
+					const multiSwitch = qBlock.querySelector('.q-multichoice');
+					setAttributes(multiSwitch, `Input.Questions[${qIndex}].IsMultiChoice`);
+					ensureHiddenInput(multiSwitch, `Input.Questions[${qIndex}].IsMultiChoice`);
+
+					const options = qBlock.querySelectorAll('.option-row');
+					options.forEach((optRow, optIndex) => {
+						const baseName = `Input.Questions[${qIndex}].Options[${optIndex}]`;
+
+						setAttributes(optRow.querySelector('.opt-text'), `${baseName}.OptionText`);
+
+						const correctChk = optRow.querySelector('.opt-is-correct');
+						setAttributes(correctChk, `${baseName}.IsCorrect`);
+						ensureHiddenInput(correctChk, `${baseName}.IsCorrect`);
+					});
+				});
+			}
+
+			function setAttributes(element, nameValue) {
+				if (element) {
+					element.name = nameValue;
+					element.id = nameValue.replace(/[\.\[\]]/g, '_');
+				}
+			}
+
+			function ensureHiddenInput(checkbox, nameValue) {
+				let parent = checkbox.parentElement;
+				let hidden = parent.querySelector(`input[type="hidden"][name="${nameValue}"]`);
+
+				if (!hidden) {
+					hidden = document.createElement('input');
+					hidden.type = 'hidden';
+					hidden.value = 'false';
+					parent.appendChild(hidden);
+				}
+				hidden.name = nameValue;
+			}
+		});
+	</script>
+}

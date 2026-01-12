@@ -109,6 +109,8 @@ public class IndexModel : PageModel
             TempData["ErrorMessage"] = "An error occurred while deleting the material.";
         }
 
+        Course = course;
+
         return RedirectToPage(new { courseUuid = CourseUuid });
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Db;
+using TdA26_CyganStudios.Services.Files;
 
 namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
@@ -13,12 +14,14 @@ public class MaterialsModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
+    private readonly IFileService _fileService;
     private readonly ILogger<CourseNewModel> _logger;
 
-    public MaterialsModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<CourseNewModel> logger)
+    public MaterialsModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, ILogger<CourseNewModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
+        _fileService = fileService;
         _logger = logger;
     }
 
@@ -29,6 +32,13 @@ public class MaterialsModel : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+       var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            return RedirectToPage("/Login");
+        }
+
         var course = await _appDb.Courses
             .Include(course => course.Materials)
             .AsNoTracking()
@@ -39,8 +49,68 @@ public class MaterialsModel : PageModel
             return NotFound();
         }
 
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
         Course = course;
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(Guid materialUuid)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            return Challenge();
+        }
+
+        var course = await _appDb.Courses
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        var material = await _appDb.Materials
+            .FirstOrDefaultAsync(material => material.CourseId == CourseUuid && material.Uuid == materialUuid);
+
+        if (material is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            course.Materials.Remove(material);
+            await _appDb.SaveChangesAsync();
+
+            if (material is DbFileMaterial fileMaterial)
+            {
+                await _fileService.DeleteAsync(fileMaterial.FileUuid);
+            }
+
+            _logger.LogInformation("Material deleted.");
+
+            TempData["SuccessMessage"] = $"Material '{material.Name}' deleted successfully.";
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Error deleting material {MaterialUuid} for user {UserId}.", materialUuid, currentUser.Id);
+            TempData["ErrorMessage"] = "An error occurred while deleting the material.";
+        }
+
+        Course = course;
+
+        return RedirectToPage(new { courseUuid = CourseUuid });
     }
 }

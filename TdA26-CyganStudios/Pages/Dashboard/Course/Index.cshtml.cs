@@ -150,8 +150,6 @@ public class IndexModel : PageModel
                 break;
         }
 
-        Course = course;
-
         return RedirectToPage(new { courseUuid = CourseUuid });
     }
 }

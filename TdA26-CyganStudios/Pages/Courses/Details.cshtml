@@ -1,7 +1,7 @@
 @page "/courses/{courseUuid}"
 @model TdA26_CyganStudios.Pages.Courses.DetailsModel
 @{
-	ViewData["Title"] = Model.Course.Name;
+    ViewData["Title"] = Model.Course.Name;
 }
 
 <h1>@Model.Course.Name</h1>
@@ -11,3 +11,6 @@
 
 <partial name="_MaterialsPreviewGrid"
     model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, false, 4)" />
+
+<partial name="_QuizzesPreviewGrid"
+    model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, false, 4)" />

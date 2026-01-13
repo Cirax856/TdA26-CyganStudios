@@ -38,6 +38,7 @@
 
     <div class="card-body">
         <h5 class="card-title mb-1">@quiz.Title</h5>
+        <button><a asp-page="/Courses/TakeQuiz" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@quiz.Uuid">Take</a></button>
         <h6>Attempts count: @(quiz.AttemptsCount is {} attemptsCount ? attemptsCount.ToString() : "unlimited")</h6>
     </div>
 

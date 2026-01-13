@@ -9,7 +9,6 @@ using TdA26_CyganStudios.Services.Files;
 
 namespace TdA26_CyganStudios.Pages.Courses;
 
-[Authorize(Roles = "lecturer")]
 public class MaterialsModel : PageModel
 {
     private readonly AppDbContext _appDb;

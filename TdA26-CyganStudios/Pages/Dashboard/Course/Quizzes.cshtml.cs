@@ -10,18 +10,16 @@ using TdA26_CyganStudios.Services.Files;
 namespace TdA26_CyganStudios.Pages.Dashboard.Course;
 
 [Authorize(Roles = "lecturer")]
-public class MaterialsModel : PageModel
+public class QuizzesModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
-    private readonly IFileService _fileService;
-    private readonly ILogger<CourseNewModel> _logger;
+    private readonly ILogger<QuizzesModel> _logger;
 
-    public MaterialsModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, ILogger<CourseNewModel> logger)
+    public QuizzesModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<QuizzesModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
-        _fileService = fileService;
         _logger = logger;
     }
 
@@ -40,7 +38,7 @@ public class MaterialsModel : PageModel
         }
 
         var course = await _appDb.Courses
-            .Include(course => course.Materials)
+            .Include(course => course.Quizzes)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 
@@ -61,7 +59,7 @@ public class MaterialsModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid itemUuid, string type)
     {
-        if (type is not "material")
+        if (type is not "quiz")
         {
             return BadRequest();
         }
@@ -86,32 +84,27 @@ public class MaterialsModel : PageModel
             return Redirect("/");
         }
 
-        var material = await _appDb.Materials
+        var quiz = await _appDb.Quizzes
             .FirstOrDefaultAsync(material => material.CourseId == CourseUuid && material.Uuid == itemUuid);
 
-        if (material is null)
+        if (quiz is null)
         {
             return NotFound();
         }
 
         try
         {
-            course.Materials.Remove(material);
+            course.Quizzes.Remove(quiz);
             await _appDb.SaveChangesAsync();
 
-            if (material is DbFileMaterial fileMaterial)
-            {
-                await _fileService.DeleteAsync(fileMaterial.FileUuid);
-            }
+            _logger.LogInformation("Quiz deleted.");
 
-            _logger.LogInformation("Material deleted.");
-
-            TempData["SuccessMessage"] = $"Material '{material.Name}' deleted successfully.";
+            TempData["SuccessMessage"] = $"Quiz '{quiz.Title}' deleted successfully.";
         }
         catch (DbUpdateException ex)
         {
-            _logger.LogError(ex, "Error deleting material {MaterialUuid} for user {UserId}.", itemUuid, currentUser.Id);
-            TempData["ErrorMessage"] = "An error occurred while deleting the material.";
+            _logger.LogError(ex, "Error deleting quiz {QuizUuid} for user {UserId}.", itemUuid, currentUser.Id);
+            TempData["ErrorMessage"] = "An error occurred while deleting the quiz.";
         }
 
         Course = course;

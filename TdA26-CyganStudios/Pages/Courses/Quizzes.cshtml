@@ -1,0 +1,10 @@
+@page "/courses/{courseUuid}/quizzes"
+@using TdA26_CyganStudios.Models.Db
+@using TdA26_CyganStudios.Utils
+@model TdA26_CyganStudios.Pages.Courses.QuizzesModel
+@{
+	ViewData["Title"] = "Quizzes";
+}
+
+
+<partial name="_QuizzesGrid" model="new QuizzesGridModel(Model.CourseUuid, Model.Course.Quizzes, false)" />

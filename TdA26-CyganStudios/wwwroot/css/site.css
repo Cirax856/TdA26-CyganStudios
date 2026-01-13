@@ -301,3 +301,7 @@ html, body {
 .page-content {
     flex: 1;
 }
+
+.bg-light {
+    background-color: var(--dblue) !important;
+}

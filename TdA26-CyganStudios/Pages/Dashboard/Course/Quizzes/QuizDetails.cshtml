@@ -4,24 +4,33 @@
 @using TdA26_CyganStudios.Utils
 @model TdA26_CyganStudios.Pages.Dashboard.Course.Quizzes.QuizDetails;
 @{
-	ViewData["Title"] = "Quizzes";
+    ViewData["Title"] = "Quizzes";
 }
 
 <h3>@Model.Quiz.Title</h3>
 
 <a asp-page="/Dashboard/Course/Quizzes/Edit" asp-route-courseUuid="@Model.CourseUuid"
-	asp-route-quizUuid="@Model.QuizUuid"><button>Edit</button></a>
+   asp-route-quizUuid="@Model.QuizUuid"><button>Edit</button></a>
 
 <form method="post" asp-page-handler="Delete" asp-route-courseUuid="@Model.CourseUuid"
-	asp-route-quizUuid="@Model.QuizUuid">
+      asp-route-quizUuid="@Model.QuizUuid">
 
-	<button type="submit" class="dropdown-item text-danger">
-		<i class="bi bi-trash"></i> Delete
-	</button>
+    <button type="submit" class="dropdown-item text-danger">
+        <i class="bi bi-trash"></i> Delete
+    </button>
 </form>
 
 <h3>Submissions</h3>
 
-@foreach (var submission in Model.Quiz.Submisions){
-	<span>Score: @(submission.Score)/@(submission.MaxScore) submited at: @submission.SubmitedAtDT.DateTime</span><br />
+@if (Model.Quiz.Submisions.Count is 0)
+{
+    <h5>No submissions</h5>
+}
+else
+{
+    @foreach (var submission in Model.Quiz.Submisions)
+    {
+        <a asp-page="/Dashboard/Course/Quizzes/QuizSubmission" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@Model.QuizUuid" asp-route-submissionUuid="@submission.Uuid"><span>Score: @(submission.Score)/@(submission.MaxScore) submited at: @submission.SubmitedAtDT.DateTime</span></a>
+        <br />
+    }
 }

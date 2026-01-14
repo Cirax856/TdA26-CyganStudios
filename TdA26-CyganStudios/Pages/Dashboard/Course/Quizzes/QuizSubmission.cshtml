@@ -1,0 +1,84 @@
+﻿@page "/dashboard/course/{courseUuid}/quizzes/{quizUuid}/submissions/{submissionUuid}"
+@model TdA26_CyganStudios.Pages.Dashboard.Course.Quizzes.QuizSubmissionModel
+@{
+}
+
+@{
+    ViewData["Title"] = Model.Quiz?.Title ?? "Quiz";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@Model.Quiz.Title</h2>
+
+    <p>Submitted at: @Model.Submission.SubmitedAtDT.DateTime</p>
+
+    <div class="alert alert-success">
+        <strong>Score:</strong> @Model.Submission.Score / @Model.Submission.MaxScore
+    </div>
+
+    <div class="mb-3">
+        <span class="badge bg-success">Correct</span>
+        <span class="badge bg-danger">Wrong</span>
+        <span class="badge bg-warning text-dark">Missed</span>
+    </div>
+
+    <form method="post">
+        @for (int i = 0; i < Model.Quiz.Questions.Count; i++)
+        {
+            var q = Model.Quiz.Questions[i];
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @(i + 1). @q.Question
+                    </h5>
+
+                    <input type="hidden" name="Answers[@i].QuestionIndex" value="@i" />
+
+                    @{
+                        int correctCount = 0;
+                        for (int o = 0; o < q.Options.Count(); o++)
+                        {
+                            if (q.CorrectIndices.Contains(o) && Model.IsOptionSelected(i, o))
+                            {
+                                correctCount++;
+                            }
+                        }
+
+                        <p>@correctCount/@q.CorrectIndices.Count()</p>
+                    }
+
+                    @for (int o = 0; o < q.Options.Count(); o++)
+                    {
+                        bool isCorrect = q.CorrectIndices.Contains(o);
+                        bool isSelected = Model.IsOptionSelected(i, o);
+                        var inputType = q.IsMultiChoice ? "checkbox" : "radio";
+                        var name = $"Answers[{i}].SelectedIndices";
+
+                        string highlight = "";
+
+                        if (isCorrect && isSelected)
+                            highlight = "border-success bg-success bg-opacity-10";
+                        else if (!isCorrect && isSelected)
+                            highlight = "border-danger bg-danger bg-opacity-10";
+                        else if (isCorrect && !isSelected)
+                            highlight = "border-warning bg-warning bg-opacity-10";
+
+                        <div class="form-check p-2 rounded border @highlight">
+                            <input class="form-check-input quiz-option" type="@inputType" name="@name" value="@o" id="q@i-o@o"
+                                   data-question="@i" data-max="@(q.IsMultiChoice? q.CorrectIndices.Count() : 1)" disabled @(Model.IsOptionSelected(i, o) ? "checked" : "") />
+
+                            <label class="form-check-label" for="q@i-o@o">
+                                @q.Options.ElementAt(o)
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <a class="btn btn-outline-secondary mb-4" asp-page="/Dashboard/Course/Quizzes/QuizDetails" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@Model.QuizUuid">
+            ← Back
+        </a>
+    </form>
+</div>

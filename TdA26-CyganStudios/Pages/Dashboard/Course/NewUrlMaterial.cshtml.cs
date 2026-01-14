@@ -142,16 +142,17 @@ public class NewUrlMaterialModel : PageModel
                 return NotFound();
             }
 
-            course.Materials.Add(new DbUrlMaterial()
+            var material = new DbUrlMaterial()
             {
                 Name = Input.Name,
                 Description = Input.Description,
                 Url = materialUrl.ToString(),
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            });
+            };
+            course.Materials.Add(material);
             await _appDb.SaveChangesAsync(cancellationToken);
 
-            await _feedManager.NewCoursePostAsync(course.Uuid, "New material was uploaded", FeedItemType.System); // TODO: name and link
+            await _feedManager.NewMaterialCreatedAsync(material);
 
             _logger.LogInformation("Material created.");
             return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });

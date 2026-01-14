@@ -19,6 +19,8 @@ public class DetailsModel : PageModel
 
     public DbCourse Course { get; set; } = null!;
 
+    public DbFeedItem[] FeedItems { get; set; }
+
     public async Task<IActionResult> OnGet()
     {
         var course = await _appDb.Courses
@@ -35,6 +37,11 @@ public class DetailsModel : PageModel
         }
 
         Course = course;
+
+        FeedItems = await _appDb.FeedItems
+            .Where(item => item.CourseId == CourseUuid)
+            .AsNoTracking()
+            .ToArrayAsync();
 
         return Page();
     }

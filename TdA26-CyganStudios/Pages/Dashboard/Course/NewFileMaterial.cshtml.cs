@@ -132,7 +132,7 @@ public class NewFileMaterialModel : PageModel
             mimeType = "application/octet-stream"; // fallback
         }
 
-        course.Materials.Add(new DbFileMaterial()
+        var material = new DbFileMaterial()
         {
             Name = Input.Name,
             Description = Input.Description,
@@ -140,10 +140,11 @@ public class NewFileMaterialModel : PageModel
             MimeType = mimeType,
             SizeInBytes = file.Length,
             CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-        });
+        };
+        course.Materials.Add(material);
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        await _feedManager.NewCoursePostAsync(course.Uuid, "New material was uploaded", FeedItemType.System); // TODO: name and link
+        await _feedManager.NewMaterialCreatedAsync(material);
 
         _logger.LogInformation("Material created.");
         return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });

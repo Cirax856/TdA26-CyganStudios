@@ -49,7 +49,7 @@ public sealed class QuizzesController : ControllerBase
         _appDb.Quizzes.Add(dbQuiz);
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        await _feedManager.NewCoursePostAsync(courseId, "New quiz was created", FeedItemType.System); // TODO: title and link
+        await _feedManager.NewQuizCreatedAsync(dbQuiz);
 
         return TypedResults.Created($"/api/courses/{courseId}/quizzes/{dbQuiz.Uuid}", Quiz.FromQuiz(dbQuiz));
     }

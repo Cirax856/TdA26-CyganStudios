@@ -5,6 +5,12 @@ namespace TdA26_CyganStudios.Services;
 public sealed class SseConnectionManager
 {
     private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<long, SseConnection>> _courseConnections = new();
+    private readonly ILogger<SseConnectionManager> _logger;
+
+    public SseConnectionManager(ILogger<SseConnectionManager> logger)
+    {
+        _logger = logger;
+    }
 
     private long _nextId;
 
@@ -14,6 +20,8 @@ public sealed class SseConnectionManager
 
         var id = Interlocked.Increment(ref _nextId);
         connections[id] = new SseConnection(response, connectionCancellationToken);
+
+        _logger.LogInformation("New sse connection, course: {CourseId}", courseId);
         return id;
     }
 
@@ -23,6 +31,8 @@ public sealed class SseConnectionManager
         {
             connections.TryRemove(id, out _);
         }
+
+        _logger.LogInformation("Removed sse connection, course: {CourseId}", courseId);
     }
 
     public async Task SendPingAsync(Guid courseId, long connectionId)
@@ -40,8 +50,10 @@ public sealed class SseConnectionManager
 
     public async Task BroadcastCourseAsync(Guid courseId, string eventName, string data, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Sse broadcast, course: {CourseId}", courseId);
         if (!_courseConnections.TryGetValue(courseId, out var connections) || connections.IsEmpty)
         {
+            _logger.LogInformation("Sse broadcast, course: {CourseId}, no connections", courseId);
             return; // no connected clients
         }
 

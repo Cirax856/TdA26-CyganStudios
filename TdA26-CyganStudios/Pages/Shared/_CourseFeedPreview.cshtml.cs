@@ -4,4 +4,4 @@ using TdA26_CyganStudios.Models.Db;
 
 namespace TdA26_CyganStudios;
 
-public sealed record CourseFeedPreviewModel(Guid CourseId, IEnumerable<DbFeedItem> Items, int MaxPreviewCount = 4);
+public sealed record CourseFeedPreviewModel(Guid CourseId, IEnumerable<DbFeedItem> Items, bool Editable, int MaxPreviewCount = 6);

@@ -108,7 +108,7 @@ public sealed class MaterialsController : ControllerBase
         course.Materials.Add(material);
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        await _feedManager.NewCoursePostAsync(courseId, "New material was uploaded", FeedItemType.System); // TODO: name and link
+        await _feedManager.NewMaterialCreatedAsync(material);
 
         var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
         return TypedResults.Created($"/api/courses/{courseId}/materials/{material.Uuid}", Material.FromMaterial(material, baseUrl));
@@ -155,7 +155,7 @@ public sealed class MaterialsController : ControllerBase
         course.Materials.Add(material);
         await _appDb.SaveChangesAsync(cancellationToken);
         
-        await _feedManager.NewCoursePostAsync(courseId, "New material was uploaded", FeedItemType.System); // TODO: name and link
+        await _feedManager.NewMaterialCreatedAsync(material);
 
         var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
         return TypedResults.Created($"/api/courses/{courseId}/materials/{material.Uuid}", Material.FromMaterial(material, baseUrl));

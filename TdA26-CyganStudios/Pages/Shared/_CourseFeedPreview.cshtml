@@ -47,9 +47,7 @@
             }
         }
 
-        @if (showViewAllCard)
-        {
-            <div class="card text-center view-all-feed">
+            <div id="view-all-card" class="card text-center view-all-feed" style="display: @(showViewAllCard ? "none" : "block");">
                 <div class="card-body py-4">
                     <a asp-page="/Courses/Feed"
                        asp-route-courseUuid="@Model.CourseId"
@@ -57,19 +55,8 @@
 
                         <i class="bi bi-collection h4"></i>
                         <h6 class="mt-2 mb-0">View all activity</h6>
-                        <small class="text-muted">
-                            (@totalCount total)
-                        </small>
                     </a>
                 </div>
             </div>
-        }
     </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/course-feed-sse.js"></script>
-    <script>
-        startCourseFeed("@Model.CourseId");
-    </script>
-}

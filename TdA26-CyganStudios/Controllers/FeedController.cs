@@ -62,7 +62,7 @@ public sealed class FeedController : ControllerBase
         {
             CourseId = courseId,
             Type = DbFeedItemType.Manual,
-            Message = request.Message,
+            Message = request.Message, // TODO: sanitize
             Edited = false,
             CreatedAt = now.ToUnixTimeMilliseconds(),
         };
@@ -70,7 +70,7 @@ public sealed class FeedController : ControllerBase
         _appDb.FeedItems.Add(feedItem);
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        await _sseConnectionManager.BroadcastCourseAsync(courseId, "new_post", JsonSerializer.Serialize(new NewPost(feedItem.Uuid, feedItem.Message), feedSerializerOptions));
+        await _sseConnectionManager.BroadcastCourseAsync(courseId, "new_post", JsonSerializer.Serialize(new NewPost(feedItem.Uuid, feedItem.CreatedAtDT.DateTime, feedItem.Type is DbFeedItemType.System, feedItem.Message), feedSerializerOptions));
 
         return TypedResults.Created($"/api/courses/{courseId}/feed", FeedItem.FromFeedItem(feedItem));
     }
@@ -140,6 +140,11 @@ public sealed class FeedController : ControllerBase
 
         Response.Headers.Append("Cache-Control", "no-cache");
         Response.Headers.Append("Content-Type", "text/event-stream");
+        Response.Headers.Append("Connection", "keep-alive");
+
+        Response.Headers.Append("Access-Control-Allow-Origin", "*");
+
+        await Response.Body.FlushAsync(cancellationToken);
 
         var connectionId = _sseConnectionManager.AddCourseConnection(courseId, Response, cancellationToken);
 

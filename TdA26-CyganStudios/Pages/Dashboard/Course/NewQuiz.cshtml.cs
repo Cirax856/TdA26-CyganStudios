@@ -135,7 +135,7 @@ public class NewQuizModel : PageModel
         _appDb.Quizzes.Add(newQuiz);
         await _appDb.SaveChangesAsync(cancellationToken);
 
-        await _feedManager.NewCoursePostAsync(course.Uuid, "New quiz was created", FeedItemType.System); // TODO: title and link
+        await _feedManager.NewQuizCreatedAsync(newQuiz);
 
         _logger.LogInformation("Quiz created.");
         return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });

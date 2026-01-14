@@ -20,7 +20,7 @@
         </div>
 
         <div class="mt-2">
-            @Model.Item.Message
+            @(Model.Item.Type is Models.Db.DbFeedItemType.System ? Html.Raw(Model.Item.Message) : Model.Item.Message)
         </div>
     </div>
 </div>

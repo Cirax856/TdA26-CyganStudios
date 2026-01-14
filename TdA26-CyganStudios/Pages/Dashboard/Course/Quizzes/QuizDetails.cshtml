@@ -1,0 +1,27 @@
+@page "/dashboard/course/{courseUuid}/quizzes/{quizUuid}"
+@using TdA26_CyganStudios.Models.Api
+@using TdA26_CyganStudios.Models.Db
+@using TdA26_CyganStudios.Utils
+@model TdA26_CyganStudios.Pages.Dashboard.Course.Quizzes.QuizDetails;
+@{
+	ViewData["Title"] = "Quizzes";
+}
+
+<h3>@Model.Quiz.Title</h3>
+
+<a asp-page="/Dashboard/Course/Quizzes/Edit" asp-route-courseUuid="@Model.CourseUuid"
+	asp-route-quizUuid="@Model.QuizUuid"><button>Edit</button></a>
+
+<form method="post" asp-page-handler="Delete" asp-route-courseUuid="@Model.CourseUuid"
+	asp-route-quizUuid="@Model.QuizUuid">
+
+	<button type="submit" class="dropdown-item text-danger">
+		<i class="bi bi-trash"></i> Delete
+	</button>
+</form>
+
+<h3>Submissions</h3>
+
+@foreach (var submission in Model.Quiz.Submisions){
+	<span>Score: @(submission.Score)/@(submission.MaxScore) submited at: @submission.SubmitedAtDT.DateTime</span><br />
+}

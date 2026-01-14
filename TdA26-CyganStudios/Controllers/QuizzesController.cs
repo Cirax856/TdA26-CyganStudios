@@ -209,6 +209,8 @@ public sealed class QuizzesController : ControllerBase
         {
             QuizId = quizId,
             Answers = answers,
+            Score = score,
+            MaxScore = maxScore,
             SubmitedAt = now.ToUnixTimeMilliseconds(),
         };
 

@@ -87,6 +87,8 @@ public class TakeQuizModel : PageModel
         {
             QuizId = Quiz.Uuid,
             Answers = dbAnswers,
+            Score = score,
+            MaxScore = Quiz.Questions.Sum(q => q.CorrectIndices.Count()),
             SubmitedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
 

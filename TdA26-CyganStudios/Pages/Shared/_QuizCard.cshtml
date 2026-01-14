@@ -18,8 +18,8 @@
 
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a class="dropdown-item" asp-page="/Dashboard/QuizEdit" asp-route-courseUuid="@Model.CourseUuid"
-                        asp-route-quizUuid="@quiz.Uuid">
+                    <a class="dropdown-item" asp-page="/Dashboard/Course/Quizzes/Edit"
+                        asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@quiz.Uuid">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
                 </li>
@@ -37,9 +37,21 @@
     }
 
     <div class="card-body">
-        <h5 class="card-title mb-1">@quiz.Title</h5>
-        <button><a asp-page="/Courses/TakeQuiz" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@quiz.Uuid">Take</a></button>
-        <h6>Attempts count: @(quiz.AttemptsCount is {} attemptsCount ? attemptsCount.ToString() : "unlimited")</h6>
+        @if (Model.Editable)
+        {
+            <a asp-page="/Dashboard/Course/Quizzes/QuizDetails" asp-route-courseUuid="@Model.CourseUuid"
+                asp-route-quizUuid="@quiz.Uuid">
+                <h5 class="card-title mb-1">@quiz.Title</h5>
+            </a>
+        }
+        else
+        {
+            <h5 class="card-title mb-1">@quiz.Title</h5>
+            <button><a asp-page="/Courses/TakeQuiz" asp-route-courseUuid="@Model.CourseUuid"
+                    asp-route-quizUuid="@quiz.Uuid">Take</a></button>
+        }
+        <h6>Attempts count: @(quiz.AttemptsCount is { } attemptsCount ? attemptsCount.ToString() : "unlimited")</h6>
+        <h6>Taken @(quiz.Submisions.Count) times</h6>
     </div>
 
 </div>

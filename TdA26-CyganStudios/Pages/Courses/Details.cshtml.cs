@@ -25,6 +25,7 @@ public class DetailsModel : PageModel
             .Include(course => course.Lecturer)
             .Include(course => course.Materials)
             .Include(course => course.Quizzes)
+            .ThenInclude(quiz => quiz.Submisions)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 

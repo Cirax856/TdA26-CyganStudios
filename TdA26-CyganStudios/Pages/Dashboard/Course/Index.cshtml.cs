@@ -42,6 +42,7 @@ public class IndexModel : PageModel
         var course = await _appDb.Courses
             .Include(course => course.Materials)
             .Include(course => course.Quizzes)
+            .ThenInclude(quiz => quiz.Submisions)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 

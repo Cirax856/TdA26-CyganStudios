@@ -29,6 +29,7 @@ public class QuizzesModel : PageModel
     {
         var course = await _appDb.Courses
             .Include(course => course.Quizzes)
+            .ThenInclude(quiz => quiz.Submisions)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 

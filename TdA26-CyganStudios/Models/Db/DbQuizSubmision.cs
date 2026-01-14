@@ -15,6 +15,10 @@ public class DbQuizSubmision
 
     public IList<DbQuizAnswer> Answers { get; set; }
 
+    public required int Score { get; set; }
+    
+    public required int MaxScore { get; set; }
+
     public required long SubmitedAt { get; set; }
 
     [NotMapped]

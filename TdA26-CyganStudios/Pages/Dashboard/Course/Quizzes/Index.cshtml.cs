@@ -7,16 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using TdA26_CyganStudios.Models.Db;
 using TdA26_CyganStudios.Services.Files;
 
-namespace TdA26_CyganStudios.Pages.Dashboard.Course;
+namespace TdA26_CyganStudios.Pages.Dashboard.Course.Quizzes;
 
 [Authorize(Roles = "lecturer")]
-public class QuizzesModel : PageModel
+public class IndexModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
-    private readonly ILogger<QuizzesModel> _logger;
+    private readonly ILogger<IndexModel> _logger;
 
-    public QuizzesModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<QuizzesModel> logger)
+    public IndexModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, ILogger<IndexModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
@@ -39,6 +39,7 @@ public class QuizzesModel : PageModel
 
         var course = await _appDb.Courses
             .Include(course => course.Quizzes)
+            .ThenInclude(quiz => quiz.Submisions)
             .AsNoTracking()
             .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
 

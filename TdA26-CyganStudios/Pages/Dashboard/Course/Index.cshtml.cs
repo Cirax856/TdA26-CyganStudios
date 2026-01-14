@@ -30,6 +30,8 @@ public class IndexModel : PageModel
 
     public DbCourse Course { get; set; }
 
+    public DbFeedItem[] FeedItems { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         var currentUser = await _userManager.GetUserAsync(User);
@@ -57,6 +59,11 @@ public class IndexModel : PageModel
         }
 
         Course = course;
+
+        FeedItems = await _appDb.FeedItems
+            .Where(item => item.CourseId == CourseUuid)
+            .AsNoTracking()
+            .ToArrayAsync();
 
         return Page();
     }

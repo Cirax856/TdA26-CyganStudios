@@ -1,0 +1,26 @@
+﻿@model FeedItemCardModel;
+
+<div class="card feed-item" data-uuid="@Model.Item.Uuid">
+    <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <span class="badge bg-secondary me-2">
+                    @Model.Item.Type
+                </span>
+
+                @if (Model.Item.Edited)
+                {
+                    <span class="badge bg-light text-muted">edited</span>
+                }
+            </div>
+
+            <small class="text-muted">
+                @Model.Item.CreatedAtDT.LocalDateTime.ToString("g")
+            </small>
+        </div>
+
+        <div class="mt-2">
+            @Model.Item.Message
+        </div>
+    </div>
+</div>

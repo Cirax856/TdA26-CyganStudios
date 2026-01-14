@@ -13,6 +13,8 @@
 </a>
 
 <partial name="_MaterialsPreviewGrid"
-    model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true)" />
+         model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true)" />
 
 <partial name="_QuizzesPreviewGrid" model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, true)" />
+
+<partial name="_CourseFeedPreview" model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems)" />

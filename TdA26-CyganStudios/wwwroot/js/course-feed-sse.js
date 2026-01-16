@@ -1,18 +1,22 @@
 ﻿let eventSource;
 
-function startCourseFeed(courseId, maxPreviewCount) {
+function startCourseFeed(courseId, maxPreviewCount, editable) {
     if (eventSource) {
         eventSource.close();
     }
 
     const container = document.getElementById("feed-container");
     const viewAllCard = document.getElementById("view-all-card");
+    const noActivityYetCard = document.getElementById("no-activity-yet-card");
 
     eventSource = new EventSource(`/api/courses/${courseId}/feed/stream`);
 
     eventSource.addEventListener("new_post", (event) => {
         const data = JSON.parse(event.data);
-        prependFeedItem(data, container, viewAllCard, maxPreviewCount);
+        if (noActivityYetCard != null){
+            noActivityYetCard.style.display = "none";
+        }
+        prependFeedItem(data, container, viewAllCard, maxPreviewCount, editable);
     });
 
     eventSource.onerror = (err) => {

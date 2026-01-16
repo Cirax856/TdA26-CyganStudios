@@ -158,8 +158,8 @@ public class IndexModel : PageModel
                 break;
             case "feed-item":
                 {
-                    var feedItem = await _appDb.Quizzes
-                        .FirstOrDefaultAsync(quiz => quiz.CourseId == CourseUuid && quiz.Uuid == itemUuid);
+                    var feedItem = await _appDb.FeedItems
+                        .FirstOrDefaultAsync(feedItem => feedItem.CourseId == CourseUuid && feedItem.Uuid == itemUuid);
 
                     if (feedItem is null)
                     {
@@ -168,17 +168,17 @@ public class IndexModel : PageModel
 
                     try
                     {
-                        course.Quizzes.Remove(feedItem);
+                        course.FeedItems.Remove(feedItem);
                         await _appDb.SaveChangesAsync();
 
-                        _logger.LogInformation("Quiz deleted.");
+                        _logger.LogInformation("Feed item deleted.");
 
-                        TempData["SuccessMessage"] = $"Quiz '{feedItem.Title}' deleted successfully.";
+                        TempData["SuccessMessage"] = $"Post deleted successfully.";
                     }
                     catch (DbUpdateException ex)
                     {
-                        _logger.LogError(ex, "Error deleting quiz {QuizlUuid} for user {UserId}.", itemUuid, currentUser.Id);
-                        TempData["ErrorMessage"] = "An error occurred while deleting the quiz.";
+                        _logger.LogError(ex, "Error deleting post {PostUuid} for user {UserId}.", itemUuid, currentUser.Id);
+                        TempData["ErrorMessage"] = "An error occurred while deleting the post.";
                     }
                 }
 

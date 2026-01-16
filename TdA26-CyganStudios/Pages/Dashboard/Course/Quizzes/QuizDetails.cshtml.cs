@@ -58,4 +58,33 @@ public class QuizDetails : PageModel
 
         return Page();
     }
+
+    public async Task<IActionResult> OnPostDeleteAsync()
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            return RedirectToPage("/Login");
+        }
+
+        var quiz = await _appDb.Quizzes
+            .Include(quiz => quiz.Course)
+            .FirstOrDefaultAsync(quiz => quiz.Uuid == QuizUuid && quiz.CourseId == CourseUuid);
+
+        if (quiz is null)
+        {
+            return NotFound();
+        }
+
+        if (quiz.Course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        _appDb.Quizzes.Remove(quiz);
+        await _appDb.SaveChangesAsync();
+
+        return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
+    }
 }

@@ -70,7 +70,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid itemUuid, string type)
     {
-        if (type is not ("material" or "quiz"))
+        if (type is not ("material" or "quiz" or "feed-item"))
         {
             return BadRequest();
         }
@@ -132,7 +132,7 @@ public class IndexModel : PageModel
             case "quiz":
                 {
                     var quiz = await _appDb.Quizzes
-                                         .FirstOrDefaultAsync(quiz => quiz.CourseId == CourseUuid && quiz.Uuid == itemUuid);
+                        .FirstOrDefaultAsync(quiz => quiz.CourseId == CourseUuid && quiz.Uuid == itemUuid);
 
                     if (quiz is null)
                     {
@@ -147,6 +147,33 @@ public class IndexModel : PageModel
                         _logger.LogInformation("Quiz deleted.");
 
                         TempData["SuccessMessage"] = $"Quiz '{quiz.Title}' deleted successfully.";
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        _logger.LogError(ex, "Error deleting quiz {QuizlUuid} for user {UserId}.", itemUuid, currentUser.Id);
+                        TempData["ErrorMessage"] = "An error occurred while deleting the quiz.";
+                    }
+                }
+
+                break;
+            case "feed-item":
+                {
+                    var feedItem = await _appDb.Quizzes
+                        .FirstOrDefaultAsync(quiz => quiz.CourseId == CourseUuid && quiz.Uuid == itemUuid);
+
+                    if (feedItem is null)
+                    {
+                        return NotFound();
+                    }
+
+                    try
+                    {
+                        course.Quizzes.Remove(feedItem);
+                        await _appDb.SaveChangesAsync();
+
+                        _logger.LogInformation("Quiz deleted.");
+
+                        TempData["SuccessMessage"] = $"Quiz '{feedItem.Title}' deleted successfully.";
                     }
                     catch (DbUpdateException ex)
                     {

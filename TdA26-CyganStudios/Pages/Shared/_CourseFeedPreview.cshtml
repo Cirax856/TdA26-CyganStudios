@@ -67,7 +67,7 @@
         {
             foreach (var item in itemsToShow)
             {
-                <partial name="_FeedItemCard" model="new FeedItemCardModel(item)" />
+                <partial name="_FeedItemCard" model="new FeedItemCardModel(item, Model.Editable)" />
             }
         }
 

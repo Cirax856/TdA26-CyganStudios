@@ -1,0 +1,80 @@
+@page "/dashboard/course/{courseUuid}/materials/{materialUuid}/edit_file"
+@model TdA26_CyganStudios.Pages.Dashboard.Course.EditFileMaterialModel
+@{
+	ViewData["Title"] = "Edit File Material";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-md-4">
+		<section>
+			<form method="post" enctype="multipart/form-data">
+				<hr />
+				<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Name" class="form-control md-width" aria-required="true" placeholder="name" />
+					<label asp-for="Input.Name" class="form-label">Name</label>
+					<span asp-validation-for="Input.Name" class="text-danger"></span>
+				</div>
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Description" class="form-control md-width" aria-required="true"
+						placeholder="description" />
+					<label asp-for="Input.Description" class="form-label">Description</label>
+					<span asp-validation-for="Input.Description" class="text-danger"></span>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Material File</label>
+
+					<div id="drop-zone" class="drop-zone border p-4 text-center rounded" style="cursor: pointer;">
+						<p id="drop-text">Drag & Drop file here or click to select</p>
+						<input asp-for="Input.File" type="file" class="d-none" id="file-input" />
+						<span asp-validation-for="Input.File" class="text-danger"></span>
+					</div>
+
+					<p class="small mt-1 text-muted">
+						Allowed: .pdf .docx .txt .png .jpg .jpeg .gif .mp4 .mp3 — Max 30 MB
+					</p>
+				</div>
+				<div>
+					<button id="create-submit" type="submit" class="w-100 btn btn-lg btn-primary">Update</button>
+				</div>
+			</form>
+		</section>
+	</div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const dropText = document.getElementById('drop-text');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            dropText.textContent = e.dataTransfer.files[0].name;
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            dropText.textContent = fileInput.files[0].name;
+        } else {
+            dropText.textContent = "Drag & Drop file here or click to select";
+        }
+    });
+</script>

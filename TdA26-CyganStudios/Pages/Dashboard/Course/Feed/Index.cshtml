@@ -1,0 +1,17 @@
+@page "/dashboard/course/{courseUuid}/feed"
+@using TdA26_CyganStudios.Models.Db
+@using TdA26_CyganStudios.Utils
+@model TdA26_CyganStudios.Pages.Dashboard.Course.Feed.IndexModel;
+@{
+	ViewData["Title"] = "Course feed";
+}
+
+
+<partial name="_CourseFeed" model="new CourseFeedModel(Model.CourseUuid, Model.FeedItems, true)" />
+
+@section Scripts {
+    <script src="~/js/course-feed-sse.js"></script>
+    <script>
+        startCourseFeed("@Model.CourseUuid", @int.MaxValue);
+    </script>
+}

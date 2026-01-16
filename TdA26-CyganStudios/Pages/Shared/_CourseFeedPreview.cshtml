@@ -12,16 +12,16 @@
     }
 
     var allItems = Model.Items
-        .OrderByDescending(x => x.CreatedAt)
-        .ToList();
+    .OrderByDescending(x => x.CreatedAt)
+    .ToList();
 
     var totalCount = allItems.Count;
 
     var showViewAllCard = totalCount > Model.MaxPreviewCount;
 
     var itemsToShow = showViewAllCard
-        ? allItems.Take(Model.MaxPreviewCount - 1)
-        : allItems.Take(Model.MaxPreviewCount);
+    ? allItems.Take(Model.MaxPreviewCount - 1)
+    : allItems.Take(Model.MaxPreviewCount);
 }
 
 <div class="mt-4 border rounded p-3 md-width">
@@ -35,8 +35,8 @@
             {
                 <div class="dropdown">
                     <button class="btn btn-primary" type="button">
-                        <a class="dropdown-item"
-                           asp-page="/Dashboard/Feed/NewPost" asp-route-courseUuid="@Model.CourseId">
+                        <a class="dropdown-item" asp-page="/Dashboard/Course/Feed/NewPost"
+                            asp-route-courseUuid="@Model.CourseId">
                             + New post
                         </a>
                     </button>
@@ -49,9 +49,8 @@
         </a>
     </div>
 
-    <div id="feed-container" class="d-flex flex-column gap-3"
-         data-max="@Model.MaxPreviewCount"
-         data-total="@totalCount">
+    <div id="feed-container" class="d-flex flex-column gap-3" data-max="@Model.MaxPreviewCount"
+        data-total="@totalCount">
 
         @if (!itemsToShow.Any())
         {
@@ -71,11 +70,11 @@
             }
         }
 
-        <div id="view-all-card" class="card text-center view-all-feed" style="display: @(showViewAllCard ? "block" : "none");">
+        <div id="view-all-card" class="card text-center view-all-feed"
+            style="display: @(showViewAllCard ? "block" : "none");">
             <div class="card-body py-4">
-                <a asp-page="/Courses/Feed"
-                   asp-route-courseUuid="@Model.CourseId"
-                   class="stretched-link text-decoration-none text-body">
+                <a asp-page="@allFeedPage" asp-route-courseUuid="@Model.CourseId"
+                    class="stretched-link text-decoration-none text-body">
 
                     <i class="bi bi-collection h4"></i>
                     <h6 class="mt-2 mb-0">View all</h6>

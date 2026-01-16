@@ -12,7 +12,7 @@ using TdA26_CyganStudios.Models.Db;
 using TdA26_CyganStudios.Services;
 using TdA26_CyganStudios.Services.Files;
 
-namespace TdA26_CyganStudios.Pages.Dashboard.Feed;
+namespace TdA26_CyganStudios.Pages.Dashboard.Course.Feed;
 
 [Authorize(Roles = "lecturer")]
 public class NewPostModel : PageModel

@@ -10,7 +10,7 @@
 <h3>@Model.Quiz.Title</h3>
 
 <a asp-page="/Dashboard/Course/Quizzes/Edit" asp-route-courseUuid="@Model.CourseUuid"
-   asp-route-quizUuid="@Model.QuizUuid"><button>Edit</button></a>
+   asp-route-quizUuid="@Model.QuizUuid"><button style="border: none; background-color: var(--lblue); padding: .2rem;">Edit</button></a>
 
 <form method="post" asp-page-handler="Delete" asp-route-courseUuid="@Model.CourseUuid"
       asp-route-quizUuid="@Model.QuizUuid" onsubmit="return confirm('Are you sure you want to delete this quiz?');">
@@ -30,7 +30,7 @@ else
 {
     @foreach (var submission in Model.Quiz.Submisions)
     {
-        <a asp-page="/Dashboard/Course/Quizzes/QuizSubmission" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@Model.QuizUuid" asp-route-submissionUuid="@submission.Uuid"><span>Score: @(submission.Score)/@(submission.MaxScore) submited at: @submission.SubmitedAtDT.DateTime</span></a>
+        <a class="card mb-4" style="padding: 1rem; margin-bottom: 0 !important;" asp-page="/Dashboard/Course/Quizzes/QuizSubmission" asp-route-courseUuid="@Model.CourseUuid" asp-route-quizUuid="@Model.QuizUuid" asp-route-submissionUuid="@submission.Uuid"><span>Score: @(submission.Score)/@(submission.MaxScore)</span><span>submited at: @submission.SubmitedAtDT.DateTime</span></a>
         <br />
     }
 }

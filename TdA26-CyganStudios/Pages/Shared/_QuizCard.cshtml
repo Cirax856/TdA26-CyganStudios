@@ -47,7 +47,7 @@
         else
         {
             <h5 class="card-title mb-1">@quiz.Title</h5>
-            <button><a asp-page="/Courses/TakeQuiz" asp-route-courseUuid="@Model.CourseUuid"
+            <button style="background-color: var(--lblue); border: none; text-decoration: none; padding: .2rem;"><a style="color: white;" asp-page="/Courses/TakeQuiz" asp-route-courseUuid="@Model.CourseUuid"
                     asp-route-quizUuid="@quiz.Uuid">Take</a></button>
         }
         <h6>Attempts count: @(quiz.AttemptsCount is { } attemptsCount ? attemptsCount.ToString() : "unlimited")</h6>

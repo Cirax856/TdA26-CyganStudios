@@ -76,7 +76,7 @@
                                 highlight = "border-warning bg-warning bg-opacity-10";
                         }
 
-                        <div class="form-check p-2 rounded border @highlight">
+                        <div class="flex gap form-check p-2 rounded border @highlight">
                             <input class="form-check-input quiz-option" type="@inputType" name="@name" value="@o" id="q@i-o@o"
                                    data-question="@i" data-max="@(q.IsMultiChoice? q.CorrectIndices.Count() : 1)" @(Model.Score is not null ? "disabled" : "") @(Model.Score is not null && Model.IsOptionSelected(i, o) ? "checked" : "") />
 

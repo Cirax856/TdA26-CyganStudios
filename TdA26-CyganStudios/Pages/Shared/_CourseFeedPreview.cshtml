@@ -1,6 +1,16 @@
 ﻿@model CourseFeedPreviewModel;
 
 @{
+    string allFeedPage;
+    if (Model.Editable)
+    {
+        allFeedPage = "/Dashboard/Course/Feed/Index";
+    }
+    else
+    {
+        allFeedPage = "/Courses/Feed";
+    }
+
     var allItems = Model.Items
         .OrderByDescending(x => x.CreatedAt)
         .ToList();
@@ -16,11 +26,25 @@
 
 <div class="mt-4 border rounded p-3 md-width">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Activity</h3>
+        <div class="d-flex align-items-center gap-3">
+            <a asp-page="@allFeedPage" asp-route-courseUuid="@Model.CourseId" class="text-decoration-none fs-4">
+                <h3 class="mb-0">Activity</h3>
+            </a>
 
-        <a asp-page="/Courses/Feed"
-           asp-route-courseUuid="@Model.CourseId"
-           class="text-decoration-none fs-5">
+            @if (Model.Editable)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-primary" type="button">
+                        <a class="dropdown-item"
+                           asp-page="/Dashboard/Feed/NewPost" asp-route-courseUuid="@Model.CourseId">
+                            + New post
+                        </a>
+                    </button>
+                </div>
+            }
+        </div>
+
+        <a asp-page="@allFeedPage" asp-route-courseUuid="@Model.CourseId" class="text-decoration-none fs-4">
             &gt;
         </a>
     </div>
@@ -47,16 +71,16 @@
             }
         }
 
-            <div id="view-all-card" class="card text-center view-all-feed" style="display: @(showViewAllCard ? "none" : "block");">
-                <div class="card-body py-4">
-                    <a asp-page="/Courses/Feed"
-                       asp-route-courseUuid="@Model.CourseId"
-                       class="stretched-link text-decoration-none text-body">
+        <div id="view-all-card" class="card text-center view-all-feed" style="display: @(showViewAllCard ? "block" : "none");">
+            <div class="card-body py-4">
+                <a asp-page="/Courses/Feed"
+                   asp-route-courseUuid="@Model.CourseId"
+                   class="stretched-link text-decoration-none text-body">
 
-                        <i class="bi bi-collection h4"></i>
-                        <h6 class="mt-2 mb-0">View all activity</h6>
-                    </a>
-                </div>
+                    <i class="bi bi-collection h4"></i>
+                    <h6 class="mt-2 mb-0">View all</h6>
+                </a>
             </div>
+        </div>
     </div>
 </div>

@@ -4,6 +4,7 @@
 @model TdA26_CyganStudios.Pages.Dashboard.Course.IndexModel
 @{
     ViewData["Title"] = "Course";
+    const int MaxFeedPreview = 6;
 }
 
 <h1>@Model.Course.Name</h1>
@@ -17,4 +18,11 @@
 
 <partial name="_QuizzesPreviewGrid" model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, true)" />
 
-<partial name="_CourseFeedPreview" model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems, true)" />
+<partial name="_CourseFeedPreview" model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems, true, MaxFeedPreview)" />
+
+@section Scripts {
+    <script src="~/js/course-feed-sse.js"></script>
+    <script>
+        startCourseFeed("@Model.CourseUuid", @MaxFeedPreview);
+    </script>
+}

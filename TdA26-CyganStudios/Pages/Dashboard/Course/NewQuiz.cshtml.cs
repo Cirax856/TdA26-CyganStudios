@@ -19,17 +19,13 @@ public class NewQuizModel : PageModel
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly AppDbContext _appDb;
-    private readonly IFileService _fileService;
-    private readonly FileExtensionContentTypeProvider _fileExtensionTypeProvider;
     private readonly FeedManager _feedManager;
-    private readonly ILogger<CourseNewModel> _logger;
+    private readonly ILogger<NewQuizModel> _logger;
 
-    public NewQuizModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, IFileService fileService, FileExtensionContentTypeProvider fileExtensionTypeProvider, FeedManager feedManager, ILogger<CourseNewModel> logger)
+    public NewQuizModel(UserManager<IdentityUser<int>> userManager, AppDbContext appDb, FeedManager feedManager, ILogger<NewQuizModel> logger)
     {
         _userManager = userManager;
         _appDb = appDb;
-        _fileService = fileService;
-        _fileExtensionTypeProvider = fileExtensionTypeProvider;
         _feedManager = feedManager;
         _logger = logger;
     }

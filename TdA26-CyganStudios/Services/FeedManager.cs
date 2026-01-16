@@ -42,6 +42,9 @@ public sealed class FeedManager
         await _sseConnectionManager.BroadcastCourseAsync(courseId, "new_post", JsonSerializer.Serialize(new NewPost(feedItem.Uuid, feedItem.CreatedAtDT.DateTime, feedItem.Type is DbFeedItemType.System, feedItem.Message), feedSerializerOptions));
     }
 
+    public async Task NewUserPost(Guid courseId, string text)
+        => await NewCoursePostAsync(courseId, text, FeedItemType.Manual);
+
     public async Task NewMaterialCreatedAsync(DbMaterial material)
     {
         await NewCoursePostAsync(material.CourseId, material switch

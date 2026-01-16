@@ -1,0 +1,24 @@
+﻿@page "/dashboard/course/{courseUuid}/feed/post_new"
+@model TdA26_CyganStudios.Pages.Dashboard.Feed.NewPostModel
+@{
+	ViewData["Title"] = "New Post";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+	<div class="col-md-4">
+		<section>
+			<form method="post">
+				<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Text" class="form-control md-width" aria-required="true" placeholder="text" />
+					<span asp-validation-for="Input.Text" class="text-danger"></span>
+				</div>
+				<div>
+					<button id="create-submit" type="submit" class="w-100 btn btn-lg btn-primary">Post</button>
+				</div>
+			</form>
+		</section>
+	</div>
+</div>

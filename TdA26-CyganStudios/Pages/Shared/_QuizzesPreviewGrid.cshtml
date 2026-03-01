@@ -2,7 +2,7 @@
 
 @{
     string allQuizzesPage;
-    if (Model.Editable)
+    if (Model.Admin)
     {
         allQuizzesPage = "/Dashboard/Course/Quizzes/Index";
     }
@@ -19,7 +19,7 @@
                 <h3 class="mb-0">Quizzes</h3>
             </a>
 
-            @if (Model.Editable)
+            @if (Model.Admin)
             {
                 <div class="dropdown">
                     <button class="btn btn-primary" type="button"> <a class="dropdown-item"
@@ -65,7 +65,7 @@
                 @foreach (var quiz in quizzesToShow)
                 {
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <partial name="_QuizCard" model="new QuizCardModel(quiz, Model.CourseUuid, Model.Editable)" />
+                        <partial name="_QuizCard" model="new QuizCardModel(quiz, Model.CourseUuid, Model.Admin, Model.Editable)" />
                     </div>
                 }
             }

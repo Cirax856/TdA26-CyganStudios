@@ -6,5 +6,4 @@
 	ViewData["Title"] = "Quizzes";
 }
 
-
-<partial name="_QuizzesGrid" model="new QuizzesGridModel(Model.CourseUuid, Model.Course.Quizzes, false)" />
+<partial name="_QuizzesGrid" model="new QuizzesGridModel(Model.CourseUuid, Model.Course.Quizzes, false, Model.Course.State.IsStudentEditable)" />

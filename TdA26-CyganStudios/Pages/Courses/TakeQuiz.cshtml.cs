@@ -33,10 +33,17 @@ public class TakeQuizModel : PageModel
     {
         var quiz = await _appDb.Quizzes
             .AsNoTracking()
+            .Include(quiz => quiz.Course)
             .FirstOrDefaultAsync(quiz => quiz.Uuid == QuizUuid && quiz.CourseId == CourseUuid);
 
         if (quiz is null)
         {
+            return NotFound();
+        }
+
+        if (!quiz.Course.State.IsStudentEditable)
+        {
+            // todo: should this return a custom page?
             return NotFound();
         }
 
@@ -49,10 +56,17 @@ public class TakeQuizModel : PageModel
     {
         var quiz = await _appDb.Quizzes
             .AsNoTracking()
+            .Include(quiz => quiz.Course)
             .FirstOrDefaultAsync(quiz => quiz.Uuid == QuizUuid && quiz.CourseId == CourseUuid);
 
         if (quiz is null)
         {
+            return NotFound();
+        }
+
+        if (!quiz.Course.State.IsStudentEditable)
+        {
+            // todo: should this return a custom page?
             return NotFound();
         }
 

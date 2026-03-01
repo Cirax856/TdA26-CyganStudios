@@ -68,6 +68,64 @@ public class IndexModel : PageModel
         return Page();
     }
 
+    public async Task<IActionResult> OnPostSetStateAsync(string action)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            return Challenge();
+        }
+
+        var course = await _appDb.Courses
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        switch (action)
+        {
+            case "publish":
+                course.State = CourseState.Published;
+                break;
+            case "archive":
+                course.State = CourseState.Archived;
+                break;
+            case "pause":
+                course.State = CourseState.Paused;
+                break;
+            case "draft":
+                course.State = CourseState.Draft;
+                break;
+            case "unarchive":
+            case "unpause":
+                course.State = CourseState.Published;
+                break;
+            default:
+                return BadRequest();
+        }
+
+        try
+        {
+            await _appDb.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Course state updated.";
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Error changing course state {CourseUuid} for user {UserId}.", CourseUuid, currentUser.Id);
+            TempData["ErrorMessage"] = "An error occurred while updating the course state.";
+        }
+
+        return RedirectToPage(new { courseUuid = CourseUuid });
+    }
+
     public async Task<IActionResult> OnPostDeleteAsync(Guid itemUuid, string type)
     {
         if (type is not ("material" or "quiz" or "feed-item"))

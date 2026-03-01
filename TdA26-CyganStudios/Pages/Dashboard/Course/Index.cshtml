@@ -9,9 +9,68 @@
 
 <h1>@Model.Course.Name</h1>
 
-<a asp-page="/Dashboard/Course/Edit" asp-route-courseUuid="@Model.CourseUuid" class="text-decoration-none">
-    Edit
-</a>
+@if (Model.Course.State != CourseState.Published)
+{
+    var alertClass = Model.Course.State switch
+    {
+        CourseState.Draft => "alert-danger",
+        CourseState.Archived => "alert-dark",
+        CourseState.Paused => "alert-info",
+        _ => "alert-warning"
+    };
+    <div class="alert @alertClass">
+        <strong>State:</strong> @Model.Course.State
+    </div>
+}
+
+<div class="mb-2">
+    <a asp-page="/Dashboard/Course/Edit" asp-route-courseUuid="@Model.CourseUuid" class="text-decoration-none">
+        Edit
+    </a>
+
+    @* state‑dependent action buttons *@
+    @{
+        var state = Model.Course.State;
+        switch (state)
+        {
+            case CourseState.Draft:
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="publish" />
+                    <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-circle"></i> Publish</button>
+                </form>;
+                break;
+
+            case CourseState.Published:
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="archive" />
+                    <button type="submit" class="btn btn-sm btn-dark ms-2"><i class="bi bi-archive"></i> Archive</button>
+                </form>
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="pause" />
+                    <button type="submit" class="btn btn-sm btn-secondary ms-2"><i class="bi bi-pause-circle"></i> Pause</button>
+                </form>
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="draft" />
+                    <button type="submit" class="btn btn-sm btn-warning ms-2"><i class="bi bi-arrow-down-circle"></i> Back to draft</button>
+                </form>;
+                break;
+
+            case CourseState.Archived:
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="unarchive" />
+                    <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-from-bracket"></i> Unarchive</button>
+                </form>;
+                break;
+
+            case CourseState.Paused:
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="unpause" />
+                    <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-play-circle"></i> Resume</button>
+                </form>;
+                break;
+        }
+    }
+</div>
 
 <partial name="_MaterialsPreviewGrid"
          model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true)" />

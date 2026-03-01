@@ -1,4 +1,5 @@
 @page "/courses/{courseUuid}"
+@using TdA26_CyganStudios.Models.Db
 @model TdA26_CyganStudios.Pages.Courses.DetailsModel
 @{
     ViewData["Title"] = Model.Course.Name;
@@ -7,6 +8,20 @@
 
 <h1>@Model.Course.Name</h1>
 <h3>Lecturer: @Model.Course.Lecturer.UserName</h3>
+
+@if (Model.Course.State != CourseState.Published)
+{
+    var alertClass = Model.Course.State switch
+    {
+        CourseState.Draft => "alert-danger",
+        CourseState.Archived => "alert-dark",
+        CourseState.Paused => "alert-info",
+        _ => "alert-warning"
+    };
+    <div class="alert @alertClass">
+        <strong>State:</strong> @Model.Course.State
+    </div>
+}
 
 <p>@Model.Course.Description</p>
 

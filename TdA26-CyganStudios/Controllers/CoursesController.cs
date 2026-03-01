@@ -34,7 +34,8 @@ public sealed class CoursesController : ControllerBase
 
         var now = DateTime.UtcNow;
 
-        var course = new DbCourse(lecturer, request.Name, request.Description, now);
+        var state = CourseState.Published; // todo
+        var course = new DbCourse(lecturer, request.Name, request.Description, state, now);
         await _appDb.Courses.AddAsync(course, cancellationToken);
         await _appDb.SaveChangesAsync(cancellationToken);
 

@@ -7,8 +7,9 @@
     <RootNamespace>TdA26_CyganStudios</RootNamespace>
     <UserSecretsId>1b7c0c0c-4d73-4026-90af-21a17d27df43</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<EnableNETAnalyzers>true</EnableNETAnalyzers>
-	<AnalysisMode>All</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>All</AnalysisMode>
+    <LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

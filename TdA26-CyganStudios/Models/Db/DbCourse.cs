@@ -22,6 +22,8 @@ public class DbCourse
 
     public long UpdatedAt { get; set; }
 
+    public CourseState State { get; set; }
+
     public ICollection<DbMaterial> Materials { get; set; } = [];
 
     public ICollection<DbQuiz> Quizzes { get; set; } = [];
@@ -48,7 +50,7 @@ public class DbCourse
         }
     }
 
-    public DbCourse(IdentityUser<int> lecturer, string name, string? description, DateTimeOffset now)
+    public DbCourse(IdentityUser<int> lecturer, string name, string? description, CourseState state, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(lecturer);
         ArgumentNullException.ThrowIfNull(name);
@@ -57,6 +59,7 @@ public class DbCourse
         LecturerId = lecturer.Id;
         Name = name;
         Description = description;
+        State = state;
         CreatedAtDT = now;
         UpdatedAtDT = now;
     }

@@ -36,6 +36,14 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
+        // if course is not public, only the lecturer who owns it should be able to see it
+        if (!course.State.IsPublic)
+        {
+            // there is no user manager in this page, so simply hide if someone unauthenticated tries
+            // redirecting to login would be confusing; treat as not found
+            return NotFound();
+        }
+
         Course = course;
 
         FeedItems = await _appDb.FeedItems

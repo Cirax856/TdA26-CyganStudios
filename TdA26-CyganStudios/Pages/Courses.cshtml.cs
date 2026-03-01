@@ -35,6 +35,7 @@ public class CoursesModel : PageModel
     public async Task OnGetAsync()
     {
         IQueryable<DbCourse> query = _appDb.Courses
+            .Where(course => course.State != CourseState.Draft)
             .Include(course => course.Lecturer)
             .AsNoTracking();
 

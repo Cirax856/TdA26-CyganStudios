@@ -2,21 +2,20 @@
 
 #nullable disable
 
-namespace TdA26_CyganStudios.Migrations
+namespace TdA26_CyganStudios.Migrations;
+
+/// <inheritdoc />
+public partial class FixQuestionFormat : Migration
 {
     /// <inheritdoc />
-    public partial class FixQuestionFormat : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
 
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

@@ -27,7 +27,16 @@
 			{
 				<div class="col">
 					<div class="card h-100 shadow-sm position-relative">
-
+						@{
+							var (badgeClass, iconClass) = course.State switch
+							{
+								Models.Db.CourseState.Draft => ("bg-warning text-dark", "bi-pencil-square"),
+								Models.Db.CourseState.Archived => ("bg-dark text-white", "bi-archive"),
+								Models.Db.CourseState.Paused => ("bg-secondary text-white", "bi-pause-circle"),
+								_ => ("bg-secondary text-white", "bi-tag")
+							};
+						}
+				
 						<div class="dropdown position-absolute top-0 end-0 m-2">
 							<button class="btn btn-link text-muted p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="line-height: 1;">
 								<i class="bi bi-three-dots-vertical"></i>
@@ -43,7 +52,14 @@
 							</ul>
 						</div>
 						<div class="card-body d-flex flex-column">
-							<h5 class="card-title text-primary">
+							@if (course.State is not Models.Db.CourseState.Published)
+							{
+								<span class="badge @badgeClass mb-2 align-self-start d-inline-flex align-items-center py-1 px-2">
+									<i class="@iconClass me-1" aria-hidden="true"></i>
+									@course.State.ToString()
+								</span>
+							}
+							<h5 class="card-title text-primary mt-0">
 								<a asp-page="/Dashboard/Course/Index"
 								   asp-route-courseUuid="@course.Uuid"
 								   class="text-decoration-none no-link-deco">

@@ -22,8 +22,9 @@
 					<label asp-for="Input.Description" class="form-label">Description</label>
 					<span asp-validation-for="Input.Description" class="text-danger"></span>
 				</div>
-				<div>
-					<button id="create-submit" type="submit" class="w-100 btn btn-lg btn-primary">Create</button>
+				<div class="d-flex gap-2">
+					<button id="create-submit" name="action" value="publish" type="submit" class=" btn btn-lg btn-primary">Create</button>
+					<button id="draft-submit" name="action" value="draft" type="submit" class=" btn btn-lg btn-secondary">Save draft</button>
 				</div>
 			</form>
 		</section>

@@ -17,7 +17,6 @@ public static class DataSeeder
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<int>>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-
         const string LecturerRole = "lecturer";
         if (!await roleManager.RoleExistsAsync(LecturerRole))
         {
@@ -28,13 +27,13 @@ public static class DataSeeder
         string DefaultEmail = "lecturer@tda.com";
 
         var user = await userManager.FindByNameAsync(DefaultUserName);
-        if (user == null)
+        if (user is null)
         {
             user = new IdentityUser<int>
             {
                 UserName = DefaultUserName,
                 Email = DefaultEmail,
-                EmailConfirmed = true
+                EmailConfirmed = true,
             };
 
             var result = await userManager.CreateAsync(user, DefaultPassword);

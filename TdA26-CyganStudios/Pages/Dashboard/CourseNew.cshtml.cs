@@ -38,8 +38,11 @@ public class CourseNewModel : PageModel
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
+        // determine whether the user clicked the "Create" button or the "Save draft" button
+        bool publish = string.Equals(action, "draft", StringComparison.OrdinalIgnoreCase) ? false : true;
+
         if (ModelState.IsValid)
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -50,11 +53,13 @@ public class CourseNewModel : PageModel
                 return Page();
             }
 
-            var course = new DbCourse(currentUser, Input.Name, Input.Description, DateTimeOffset.UtcNow);
+            var state = publish ? CourseState.Published : CourseState.Draft;
+            var course = new DbCourse(currentUser, Input.Name, Input.Description, state, DateTimeOffset.UtcNow);
+
             _appDb.Courses.Add(course);
             await _appDb.SaveChangesAsync();
 
-            _logger.LogInformation("Course created.");
+            _logger.LogInformation("Course created ({publish}).", publish ? "published" : "draft");
             return LocalRedirect("~/dashboard");
         }
 

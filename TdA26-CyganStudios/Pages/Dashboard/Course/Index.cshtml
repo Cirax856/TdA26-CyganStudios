@@ -24,11 +24,13 @@
 }
 
 <div class="mb-2">
-    <a asp-page="/Dashboard/Course/Edit" asp-route-courseUuid="@Model.CourseUuid" class="text-decoration-none">
-        Edit
-    </a>
+    @if (Model.Course.State.IsLecturerEditable)
+    {
+        <a asp-page="/Dashboard/Course/Edit" asp-route-courseUuid="@Model.CourseUuid" class="text-decoration-none">
+            Edit
+        </a>
+    }
 
-    @* state‑dependent action buttons *@
     @{
         var state = Model.Course.State;
         switch (state)
@@ -37,7 +39,8 @@
                 <form method="post" asp-page-handler="SetState" class="d-inline">
                     <input type="hidden" name="action" value="publish" />
                     <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-circle"></i> Publish</button>
-                </form>;
+                </form>
+        ;
                 break;
 
             case CourseState.Published:
@@ -51,22 +54,33 @@
                 </form>
                 <form method="post" asp-page-handler="SetState" class="d-inline">
                     <input type="hidden" name="action" value="draft" />
-                    <button type="submit" class="btn btn-sm btn-warning ms-2"><i class="bi bi-arrow-down-circle"></i> Back to draft</button>
-                </form>;
+                    <button type="submit" class="btn btn-sm btn-warning ms-2"><i class="bi bi-arrow-down-circle"></i> Back to
+                        draft
+                    </button>
+                </form>
+
                 break;
 
             case CourseState.Archived:
                 <form method="post" asp-page-handler="SetState" class="d-inline">
                     <input type="hidden" name="action" value="unarchive" />
-                    <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-from-bracket"></i> Unarchive</button>
-                </form>;
+                    <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-from-bracket"></i>
+                        Unarchive
+                    </button>
+                </form>
+
                 break;
 
             case CourseState.Paused:
                 <form method="post" asp-page-handler="SetState" class="d-inline">
                     <input type="hidden" name="action" value="unpause" />
                     <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-play-circle"></i> Resume</button>
-                </form>;
+                </form>
+                <form method="post" asp-page-handler="SetState" class="d-inline">
+                    <input type="hidden" name="action" value="archive" />
+                    <button type="submit" class="btn btn-sm btn-dark ms-2"><i class="bi bi-archive"></i> Archive</button>
+                </form>
+
                 break;
         }
     }
@@ -75,13 +89,15 @@
 <partial name="_MaterialsPreviewGrid"
          model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true)" />
 
-<partial name="_QuizzesPreviewGrid" model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, true, Model.Course.State.IsLecturerEditable)" />
+<partial name="_QuizzesPreviewGrid"
+         model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, true, Model.Course.State.IsLecturerEditable)" />
 
-<partial name="_CourseFeedPreview" model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems, true, MaxFeedPreview)" />
+<partial name="_CourseFeedPreview"
+         model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems, true, MaxFeedPreview)" />
 
 @section Scripts {
     <script src="~/js/course-feed-sse.js"></script>
     <script>
-        startCourseFeed("@Model.CourseUuid", @(MaxFeedPreview), true);
+                                                                                                                                                                    startCourseFeed("@Model.CourseUuid", @(MaxFeedPreview), true);
     </script>
 }

@@ -79,6 +79,12 @@ public class EditFileMaterialModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         var material = await _appDb.FileMaterials
             .AsNoTracking()
             .FirstOrDefaultAsync(material => material.Uuid == MaterialUuid, cancellationToken);

@@ -3,4 +3,4 @@ using TdA26_CyganStudios.Models.Db;
 
 namespace TdA26_CyganStudios;
 
-public sealed record MaterialCardModel(DbMaterial Material, Guid CourseUuid, bool Editable);
+public sealed record MaterialCardModel(DbMaterial Material, Guid CourseUuid, bool Admin, bool Editable);

@@ -76,89 +76,101 @@ public class NewUrlMaterialModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser is null)
-            {
-                ModelState.AddModelError(string.Empty, "Unknown error.");
-                return Page();
-            }
-
-            Uri materialUrl;
-            try
-            {
-                materialUrl = new Uri(Input.Url.Contains("://", StringComparison.Ordinal) ? Input.Url : "https://" + Input.Url);
-            }
-            catch (UriFormatException)
-            {
-                ModelState.AddModelError(string.Empty, "Material url is invalid.");
-                return Page();
-            }
-
-            if (!materialUrl.IsAbsoluteUri)
-            {
-                ModelState.AddModelError(string.Empty, "Material url must be absolute.");
-                return Page();
-            }
-
-            if (!Input.SkipUrlVerification)
-            {
-                HttpResponseMessage response;
-                try
-                {
-                    response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                }
-                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
-                    return Page();
-                }
-                catch (HttpRequestException)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url.");
-                    return Page();
-                }
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
-                    return Page();
-                }
-            }
-
-            var course = await _appDb.Courses
-                .Include(course => course.Materials)
-                .FirstOrDefaultAsync(course => course.Uuid == CourseUuid, cancellationToken);
-
-            if (course is null)
-            {
-                return NotFound();
-            }
-
-            var material = new DbUrlMaterial()
-            {
-                Name = Input.Name,
-                Description = Input.Description,
-                Url = materialUrl.ToString(),
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            };
-            course.Materials.Add(material);
-            await _appDb.SaveChangesAsync(cancellationToken);
-
-            await _feedManager.NewMaterialCreatedAsync(material);
-
-            _logger.LogInformation("Material created.");
-            return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
+            // If we got this far, something failed, redisplay form
+            return Page();
         }
 
-        // If we got this far, something failed, redisplay form
-        return Page();
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            ModelState.AddModelError(string.Empty, "Unknown error.");
+            return Page();
+        }
+
+        Uri materialUrl;
+        try
+        {
+            materialUrl = new Uri(Input.Url.Contains("://", StringComparison.Ordinal) ? Input.Url : "https://" + Input.Url);
+        }
+        catch (UriFormatException)
+        {
+            ModelState.AddModelError(string.Empty, "Material url is invalid.");
+            return Page();
+        }
+
+        if (!materialUrl.IsAbsoluteUri)
+        {
+            ModelState.AddModelError(string.Empty, "Material url must be absolute.");
+            return Page();
+        }
+
+        if (!Input.SkipUrlVerification)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
+                return Page();
+            }
+            catch (HttpRequestException)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url.");
+                return Page();
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
+                return Page();
+            }
+        }
+
+        var course = await _appDb.Courses
+            .Include(course => course.Materials)
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid, cancellationToken);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
+        var material = new DbUrlMaterial()
+        {
+            Name = Input.Name,
+            Description = Input.Description,
+            Url = materialUrl.ToString(),
+            CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+        };
+        course.Materials.Add(material);
+        await _appDb.SaveChangesAsync(cancellationToken);
+
+        await _feedManager.NewMaterialCreatedAsync(material);
+
+        _logger.LogInformation("Material created.");
+        return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
     }
 }

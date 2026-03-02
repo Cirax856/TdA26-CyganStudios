@@ -26,7 +26,7 @@
 <p>@Model.Course.Description</p>
 
 <partial name="_MaterialsPreviewGrid"
-    model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, false, 4)" />
+    model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, false, Model.Course.State.IsStudentEditable, 4)" />
 
 <partial name="_QuizzesPreviewGrid"
     model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, false, Model.Course.State.IsStudentEditable, 4)" />

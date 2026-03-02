@@ -5,7 +5,7 @@
         <div class="d-flex align-items-center gap-3">
             <h3 class="mb-0">Materials</h3>
 
-            @if (Model.Editable)
+            @if (Model.Admin && Model.Editable)
             {
                 <div class="dropdown">
                     <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -51,7 +51,7 @@
                 {
                     <div class="card h-100 flex-fill bg-white dark:bg-secondary text-dark dark:text-light"
                         style="min-width: 18rem; max-width: 22rem; position: relative;">
-                        <partial name="_MaterialCard" model="new MaterialCardModel(material, Model.CourseUuid, Model.Editable)" />
+                        <partial name="_MaterialCard" model="new MaterialCardModel(material, Model.CourseUuid, Model.Admin, Model.Editable)" />
                     </div>
                 }
             }

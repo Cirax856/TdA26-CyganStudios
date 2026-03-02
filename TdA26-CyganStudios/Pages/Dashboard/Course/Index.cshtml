@@ -87,7 +87,7 @@
 </div>
 
 <partial name="_MaterialsPreviewGrid"
-         model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true)" />
+         model="new MaterialsPreviewGridModel(Model.CourseUuid, Model.Course.Materials, true, Model.Course.State.IsLecturerEditable)" />
 
 <partial name="_QuizzesPreviewGrid"
          model="new QuizzesPreviewGridModel(Model.CourseUuid, Model.Course.Quizzes, true, Model.Course.State.IsLecturerEditable)" />

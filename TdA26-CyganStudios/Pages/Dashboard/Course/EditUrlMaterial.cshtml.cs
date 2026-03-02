@@ -78,6 +78,12 @@ public class EditUrlMaterialModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         var material = await _appDb.UrlMaterials
             .AsNoTracking()
             .FirstOrDefaultAsync(material => material.Uuid == MaterialUuid, cancellationToken);
@@ -99,86 +105,86 @@ public class EditUrlMaterialModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser is null)
-            {
-                ModelState.AddModelError(string.Empty, "Unknown error.");
-                return Page();
-            }
-
-            Uri materialUrl;
-            try
-            {
-                materialUrl = new Uri(Input.Url.Contains("://", StringComparison.Ordinal) ? Input.Url : "https://" + Input.Url);
-            }
-            catch (UriFormatException)
-            {
-                ModelState.AddModelError(string.Empty, "Material url is invalid.");
-                return Page();
-            }
-
-            if (!materialUrl.IsAbsoluteUri)
-            {
-                ModelState.AddModelError(string.Empty, "Material url must be absolute.");
-                return Page();
-            }
-
-            if (!Input.SkipUrlVerification)
-            {
-                HttpResponseMessage response;
-                try
-                {
-                    response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                }
-                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
-                    return Page();
-                }
-                catch (HttpRequestException)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url.");
-                    return Page();
-                }
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
-                    return Page();
-                }
-            }
-
-            var course = await _appDb.Courses
-                .Include(course => course.Materials)
-                .FirstOrDefaultAsync(course => course.Uuid == CourseUuid, cancellationToken);
-
-            if (course is null)
-            {
-                return NotFound();
-            }
-
-            var material = await _appDb.UrlMaterials
-                .FirstOrDefaultAsync(material => material.Uuid == MaterialUuid, cancellationToken);
-
-            if (material is null)
-            {
-                return NotFound();
-            }
-
-            material.Name = Input.Name;
-            material.Description = Input.Description;
-            material.Url = materialUrl.ToString();
-
-            await _appDb.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Material updated.");
-            return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
+            // If we got this far, something failed, redisplay form
+            return Page();
         }
 
-        // If we got this far, something failed, redisplay form
-        return Page();
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            ModelState.AddModelError(string.Empty, "Unknown error.");
+            return Page();
+        }
+
+        Uri materialUrl;
+        try
+        {
+            materialUrl = new Uri(Input.Url.Contains("://", StringComparison.Ordinal) ? Input.Url : "https://" + Input.Url);
+        }
+        catch (UriFormatException)
+        {
+            ModelState.AddModelError(string.Empty, "Material url is invalid.");
+            return Page();
+        }
+
+        if (!materialUrl.IsAbsoluteUri)
+        {
+            ModelState.AddModelError(string.Empty, "Material url must be absolute.");
+            return Page();
+        }
+
+        if (!Input.SkipUrlVerification)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.GetAsync(materialUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url: timeout.");
+                return Page();
+            }
+            catch (HttpRequestException)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url.");
+                return Page();
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Could not verify material url: invalid status code.");
+                return Page();
+            }
+        }
+
+        var course = await _appDb.Courses
+            .Include(course => course.Materials)
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid, cancellationToken);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        var material = await _appDb.UrlMaterials
+            .FirstOrDefaultAsync(material => material.Uuid == MaterialUuid, cancellationToken);
+
+        if (material is null)
+        {
+            return NotFound();
+        }
+
+        material.Name = Input.Name;
+        material.Description = Input.Description;
+        material.Url = materialUrl.ToString();
+
+        await _appDb.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Material updated.");
+        return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
     }
 }

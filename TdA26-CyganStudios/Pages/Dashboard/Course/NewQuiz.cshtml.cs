@@ -60,6 +60,12 @@ public class NewQuizModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         Input.Questions.Add(new QuestionInput
         {
             Options = new List<OptionInput> { new() { IsCorrect = true, }, new() }
@@ -94,6 +100,12 @@ public class NewQuizModel : PageModel
         if (course.LecturerId != currentUser.Id)
         {
             return Redirect("/");
+        }
+
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
         }
 
         var newQuiz = new DbQuiz

@@ -60,6 +60,12 @@ public class EditModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         Input.Name = course.Name;
         Input.Description = course.Description;
 
@@ -68,26 +74,26 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser is null)
-            {
-                ModelState.AddModelError(string.Empty, "Unknown error.");
-                return Page();
-            }
-
-            var course = _appDb.Courses.FirstOrDefault(course => course.Uuid == CourseUuid);
-            course.Name = Input.Name;
-            course.Description = Input.Description;
-            await _appDb.SaveChangesAsync();
-
-            _logger.LogInformation("Course successfully edddited.");
-            return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
+            // If we got this far, something failed, redisplay form
+            return Page();
         }
 
-        // If we got this far, something failed, redisplay form
-        return Page();
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser is null)
+        {
+            ModelState.AddModelError(string.Empty, "Unknown error.");
+            return Page();
+        }
+
+        var course = _appDb.Courses.FirstOrDefault(course => course.Uuid == CourseUuid);
+        course.Name = Input.Name;
+        course.Description = Input.Description;
+        await _appDb.SaveChangesAsync();
+
+        _logger.LogInformation("Course successfully edddited.");
+        return RedirectToPage("/Dashboard/Course/Index", new { courseUuid = CourseUuid });
     }
 }

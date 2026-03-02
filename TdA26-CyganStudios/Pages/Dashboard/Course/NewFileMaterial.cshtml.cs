@@ -78,6 +78,12 @@ public class NewFileMaterialModel : PageModel
             return Redirect("/");
         }
 
+        if (!course.State.IsLecturerEditable)
+        {
+            // todo
+            return NotFound();
+        }
+
         return Page();
     }
 

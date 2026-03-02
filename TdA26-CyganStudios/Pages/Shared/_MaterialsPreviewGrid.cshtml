@@ -2,7 +2,7 @@
 
 @{
     string allMaterialsPage;
-    if (Model.Editable)
+    if (Model.Admin)
     {
         allMaterialsPage = "/Dashboard/Course/Materials";
     }
@@ -19,7 +19,7 @@
                 <h3 class="mb-0">Materials</h3>
             </a>
 
-            @if (Model.Editable)
+            @if (Model.Admin && Model.Editable)
             {
                 <div class="dropdown">
                     <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -80,7 +80,7 @@
                 {
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <partial name="_MaterialCard"
-                            model="new MaterialCardModel(material, Model.CourseUuid, Model.Editable)" />
+                            model="new MaterialCardModel(material, Model.CourseUuid, Model.Admin, Model.Editable)" />
                     </div>
                 }
             }

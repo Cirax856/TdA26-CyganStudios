@@ -30,6 +30,12 @@ public class DbCourse
 
     public ICollection<DbFeedItem> FeedItems { get; set; } = [];
 
+    // if the lecturer schedules the course to be published in the future
+    // the state remains Draft until the specified time has passed. once
+    // the timestamp is reached a background task (or page hit) will flip
+    // the state to Published and clear the value.
+    public long? ScheduledPublishAt { get; set; }
+
     [NotMapped]
     public DateTimeOffset CreatedAtDT
     {
@@ -47,6 +53,23 @@ public class DbCourse
         set
         {
             UpdatedAt = value.ToUnixTimeMilliseconds();
+        }
+    }
+
+    [NotMapped]
+    public DateTimeOffset? ScheduledPublishAtDT
+    {
+        get => ScheduledPublishAt is { } ts ? DateTimeOffset.FromUnixTimeMilliseconds(ts) : null;
+        set
+        {
+            if (value.HasValue)
+            {
+                ScheduledPublishAt = value.Value.ToUnixTimeMilliseconds();
+            }
+            else
+            {
+                ScheduledPublishAt = null;
+            }
         }
     }
 

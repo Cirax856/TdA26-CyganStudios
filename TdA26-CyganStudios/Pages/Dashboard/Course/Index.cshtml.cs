@@ -58,6 +58,19 @@ public class IndexModel : PageModel
             return Redirect("/");
         }
 
+        // automatically publish if the scheduled time has arrived; this
+        // cases covers users hitting the page before the background service
+        // runs. we update the state and clear the schedule field.
+        if (course.State is CourseState.Draft &&
+            course.ScheduledPublishAtDT.HasValue &&
+            course.ScheduledPublishAtDT <= DateTimeOffset.UtcNow)
+        {
+            course.State = CourseState.Published;
+            course.ScheduledPublishAt = null;
+            await _appDb.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Scheduled publish executed.";
+        }
+
         Course = course;
 
         FeedItems = await _appDb.FeedItems
@@ -94,6 +107,7 @@ public class IndexModel : PageModel
         {
             case "publish":
                 course.State = CourseState.Published;
+                course.ScheduledPublishAt = null; // clear any existing schedule
                 break;
             case "archive":
                 course.State = CourseState.Archived;
@@ -121,6 +135,103 @@ public class IndexModel : PageModel
         {
             _logger.LogError(ex, "Error changing course state {CourseUuid} for user {UserId}.", CourseUuid, currentUser.Id);
             TempData["ErrorMessage"] = "An error occurred while updating the course state.";
+        }
+
+        return RedirectToPage(new { courseUuid = CourseUuid });
+    }
+
+    // schedule the draft course to be published at a later time. if the
+    // requested time is in the past we immediately publish instead.
+    public async Task<IActionResult> OnPostSchedulePublishAsync(DateTime? publishAt)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser is null)
+        {
+            return Challenge();
+        }
+
+        var course = await _appDb.Courses
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
+        if (course is null)
+        {
+            return NotFound();
+        }
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        if (course.State != CourseState.Draft)
+        {
+            TempData["ErrorMessage"] = "Only draft courses can be scheduled.";
+            return RedirectToPage(new { courseUuid = CourseUuid });
+        }
+
+        if (!publishAt.HasValue)
+        {
+            TempData["ErrorMessage"] = "Please provide a date and time for scheduling.";
+            return RedirectToPage(new { courseUuid = CourseUuid });
+        }
+
+        var at = publishAt.Value.ToUniversalTime();
+        if (at <= DateTimeOffset.UtcNow)
+        {
+            // publish immediately
+            course.State = CourseState.Published;
+            course.ScheduledPublishAt = null;
+            TempData["SuccessMessage"] = "Course published immediately because the given time was not in the future.";
+        }
+        else
+        {
+            course.ScheduledPublishAtDT = at;
+            TempData["SuccessMessage"] = $"Publish scheduled for {at:yyyy-MM-dd HH:mm} UTC.";
+        }
+
+        try
+        {
+            await _appDb.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Error scheduling publish for course {CourseUuid} by user {UserId}.", CourseUuid, currentUser.Id);
+            TempData["ErrorMessage"] = "An error occurred while scheduling the publish.";
+        }
+
+        return RedirectToPage(new { courseUuid = CourseUuid });
+    }
+
+    public async Task<IActionResult> OnPostClearScheduleAsync()
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser is null)
+        {
+            return Challenge();
+        }
+
+        var course = await _appDb.Courses
+            .FirstOrDefaultAsync(course => course.Uuid == CourseUuid);
+        if (course is null)
+        {
+            return NotFound();
+        }
+        if (course.LecturerId != currentUser.Id)
+        {
+            return Redirect("/");
+        }
+
+        if (course.ScheduledPublishAt.HasValue)
+        {
+            course.ScheduledPublishAt = null;
+            try
+            {
+                await _appDb.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Scheduled publish cancelled.";
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error clearing scheduled publish for course {CourseUuid} by user {UserId}.", CourseUuid, currentUser.Id);
+                TempData["ErrorMessage"] = "Could not cancel scheduled publish.";
+            }
         }
 
         return RedirectToPage(new { courseUuid = CourseUuid });

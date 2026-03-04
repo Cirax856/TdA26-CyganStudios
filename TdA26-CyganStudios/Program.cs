@@ -83,6 +83,10 @@ internal static class Program
         builder.Services.AddSingleton<SseConnectionManager>();
         builder.Services.AddScoped<FeedManager>();
 
+        // background task that flips courses from draft to published once their
+        // scheduled publish timestamp has passed.
+        builder.Services.AddHostedService<ScheduledCoursePublisher>();
+
         builder.WebHost.ConfigureKestrel(options =>
         {
             options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB

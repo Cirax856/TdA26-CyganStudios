@@ -20,6 +20,11 @@
     };
     <div class="alert @alertClass">
         <strong>State:</strong> @Model.Course.State
+        @if (Model.Course.State == CourseState.Draft && Model.Course.ScheduledPublishAtDT is { } dt)
+        {
+            <br />
+            <small>Scheduled for @dt.UtcDateTime.ToString("yyyy-MM-dd HH:mm") UTC</small>
+        }
     </div>
 }
 
@@ -40,7 +45,19 @@
                     <input type="hidden" name="action" value="publish" />
                     <button type="submit" class="btn btn-sm btn-success ms-2"><i class="bi bi-arrow-up-circle"></i> Publish</button>
                 </form>
-        ;
+                <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                    <i class="bi bi-calendar-event"></i> Schedule
+                </button>
+                @* cancel schedule if one exists *@
+                @if (Model.Course.ScheduledPublishAtDT is { } dt)
+                {
+                    <form method="post" asp-page-handler="ClearSchedule" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-danger ms-2">
+                            <i class="bi bi-x-circle"></i> Cancel schedule
+                        </button>
+                    </form>
+                }
+
                 break;
 
             case CourseState.Published:
@@ -94,6 +111,30 @@
 
 <partial name="_CourseFeedPreview"
          model="new CourseFeedPreviewModel(Model.CourseUuid, Model.FeedItems, true, MaxFeedPreview)" />
+
+<!-- schedule modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" asp-page-handler="SchedulePublish">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scheduleModalLabel">Schedule publish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="publishAt" class="form-label">Publish at (UTC)</label>
+            <input type="datetime-local" class="form-control" id="publishAt" name="publishAt" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 @section Scripts {
     <script src="~/js/course-feed-sse.js"></script>
